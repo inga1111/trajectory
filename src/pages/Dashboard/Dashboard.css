@@ -1,0 +1,124 @@
+.dashboard {
+    min-height:100vh;
+    padding:40px 25px;
+    background:#f8f6ff;
+}
+
+
+.welcome {
+    margin-bottom:30px;
+}
+
+
+.small-text {
+    color:#777;
+}
+
+
+.welcome h1 {
+    font-size:42px;
+    line-height:1.1;
+    margin:10px 0;
+}
+
+
+
+.trajectory-card,
+.mission-card {
+    background:white;
+    border-radius:30px;
+    padding:25px;
+    margin-bottom:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+
+
+
+.trajectory-card {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+.progress-circle {
+
+    width:90px;
+    height:90px;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#d8c8ff;
+
+    font-size:24px;
+    font-weight:bold;
+
+}
+
+
+
+.mission-card button,
+.secondary-btn {
+
+    margin-top:20px;
+
+    border:none;
+    padding:14px 25px;
+
+    border-radius:30px;
+
+    background:#8d7cff;
+    color:white;
+
+    cursor:pointer;
+
+}
+
+
+
+.stats {
+
+    display:flex;
+    gap:15px;
+
+    margin-bottom:30px;
+
+}
+
+
+
+.stats div {
+
+    flex:1;
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:25px;
+
+    text-align:center;
+
+}
+
+
+
+.stats h3 {
+
+    font-size:28px;
+    margin:0;
+
+}
+
+
+
+.secondary-btn {
+
+    width:100%;
+    background:white;
+    color:#8d7cff;
+
+}
