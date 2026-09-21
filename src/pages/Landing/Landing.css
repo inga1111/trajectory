@@ -1,0 +1,292 @@
+.landing {
+  min-height: 100vh;
+  background: #fff8ef;
+}
+
+/* NAVIGATION */
+
+.landing-nav {
+  height: 80px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  font-size: 14px;
+}
+
+.nav-links a {
+  transition: opacity 0.2s ease;
+}
+
+.nav-links a:hover {
+  opacity: 0.6;
+}
+
+.login-link {
+  padding: 11px 20px;
+  border: 1px solid #1f2933;
+  border-radius: 30px;
+}
+
+/* HERO */
+
+.hero {
+  min-height: 650px;
+  padding: 70px 7% 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 60px;
+}
+
+.eyebrow {
+  margin: 0 0 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  opacity: 0.55;
+}
+
+.hero h1 {
+  max-width: 650px;
+  margin: 0;
+  font-size: clamp(52px, 6vw, 82px);
+  line-height: 0.98;
+  letter-spacing: -4px;
+  font-weight: 700;
+}
+
+.hero h1 span {
+  color: #6d8f91;
+}
+
+.hero-description {
+  max-width: 500px;
+  margin: 32px 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #59636b;
+}
+
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 15px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary-button {
+  background: #a7e0e2;
+  color: #172325;
+}
+
+.secondary-button {
+  border: 1px solid #d5d0c9;
+}
+
+/* VISUAL */
+
+.hero-visual {
+  position: relative;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit {
+  position: absolute;
+  border: 1px solid #d9d2c9;
+  border-radius: 50%;
+}
+
+.orbit-one {
+  width: 430px;
+  height: 430px;
+}
+
+.orbit-two {
+  width: 330px;
+  height: 330px;
+}
+
+.trajectory-card {
+  position: relative;
+  z-index: 2;
+  width: 300px;
+  padding: 28px;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 25px 70px rgba(45, 40, 35, 0.12);
+  transform: rotate(3deg);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  opacity: 0.5;
+}
+
+.progress-circle {
+  width: 145px;
+  height: 145px;
+  margin: 30px auto;
+  border: 12px solid #a7e0e2;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-circle strong {
+  font-size: 30px;
+}
+
+.progress-circle small {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.mini-task {
+  padding: 13px 0;
+  border-top: 1px solid #eee9e3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.check,
+.empty-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check {
+  background: #a7e0e2;
+  font-size: 11px;
+}
+
+.empty-check {
+  border: 1px solid #ccc5bd;
+}
+
+/* INTRO */
+
+.intro-section {
+  padding: 150px 7%;
+  text-align: center;
+  background: #eaf7f5;
+}
+
+.intro-section h2 {
+  max-width: 800px;
+  margin: 0 auto 25px;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.intro-section > p:last-child {
+  max-width: 550px;
+  margin: auto;
+  color: #59636b;
+  line-height: 1.6;
+}
+
+/* HOW IT WORKS */
+
+.how-section {
+  padding: 130px 7%;
+}
+
+.how-section h2 {
+  margin: 0 0 70px;
+  font-size: clamp(45px, 5vw, 70px);
+  letter-spacing: -3px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+}
+
+.step {
+  padding-top: 25px;
+  border-top: 1px solid #d5d0c9;
+}
+
+.step > span {
+  font-size: 12px;
+  opacity: 0.45;
+}
+
+.step h3 {
+  margin: 35px 0 12px;
+  font-size: 22px;
+}
+
+.step p {
+  margin: 0;
+  max-width: 280px;
+  color: #697279;
+  line-height: 1.6;
+}
+
+/* MOBILE */
+
+@media (max-width: 800px) {
+  .nav-links a:not(.login-link) {
+    display: none;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 50px;
+  }
+
+  .hero h1 {
+    letter-spacing: -2px;
+  }
+
+  .hero-visual {
+    height: 400px;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-section,
+  .how-section {
+    padding: 90px 7%;
+  }
+}
