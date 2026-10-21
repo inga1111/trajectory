@@ -6,6 +6,7 @@ import Questionnaire from "./pages/Questionnaire/Questionnaire";
 import Loading from "./pages/Loading/Loading";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Missions from "./pages/Missions/Missions";
+import MissionDetail from "./pages/MissionDetail/MissionDetail";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/loading" element={<Loading />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/missions" element={<Missions />} /> 
+        <Route path="/missions/:id" element={<MissionDetail />} />
 
       </Routes>
     </BrowserRouter>
