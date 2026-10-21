@@ -5,9 +5,9 @@ import {
   FiArrowLeft,
   FiArrowRight,
   FiCheck,
+  FiCheckCircle,
   FiClock,
   FiTarget,
-  FiTrophy,
 } from "react-icons/fi";
 import "./MissionDetail.css";
 
@@ -219,10 +219,10 @@ function MissionDetail() {
         {isComplete ? (
           <section className="detail-completion">
             <div className="detail-completion-icon">
-              <FiTrophy />
+              <FiCheckCircle />
             </div>
 
-            <h2>You did the thing. 🎉</h2>
+            <h2>You did the thing ! </h2>
 
             <p>
               You made it through this mission, one step at a time. Take a
