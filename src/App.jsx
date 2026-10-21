@@ -5,6 +5,7 @@ import Login from "./pages/Login/Login";
 import Questionnaire from "./pages/Questionnaire/Questionnaire";
 import Loading from "./pages/Loading/Loading";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Missions from "./pages/Missions/Missions";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/loading" element={<Loading />} />
         <Route path="/loading" element={<Loading />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/missions" element={<Missions />} /> 
 
       </Routes>
     </BrowserRouter>
