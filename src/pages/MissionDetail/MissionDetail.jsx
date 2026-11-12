@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FiArrowLeft,
   FiArrowRight,
@@ -8,125 +8,109 @@ import {
   FiCheckCircle,
   FiClock,
   FiTarget,
+  FiZap,
 } from "react-icons/fi";
 import "./MissionDetail.css";
 
 const missionDetails = {
   1: {
     title: "Start that assignment",
-    description:
-      "Turn the thing you've been putting off into a few manageable steps.",
+    description: "Turn the thing you've been putting off into a few manageable steps.",
     category: "Study",
     duration: "15 min",
     difficulty: "Easy start",
     encouragement: "You don't need to finish everything. Just begin.",
     steps: [
-      {
-        title: "Open your assignment",
-        description: "Find the brief and open the document or workspace.",
-        duration: "2 min",
-      },
-      {
-        title: "Figure out the first task",
-        description: "Choose one small thing you can work on right now.",
-        duration: "3 min",
-      },
-      {
-        title: "Work on it for five minutes",
-        description: "Start messy if you need to. You can refine it later.",
-        duration: "5 min",
-      },
+      { title: "Open your assignment", description: "Find the brief and open the document or workspace.", duration: "2 min" },
+      { title: "Figure out the first task", description: "Choose one small thing you can work on right now.", duration: "3 min" },
+      { title: "Work on it for five minutes", description: "Start messy if you need to. You can refine it later.", duration: "5 min" },
     ],
   },
   2: {
     title: "Reset your space",
-    description:
-      "Make your environment feel a little calmer, one small area at a time.",
+    description: "Make your environment feel a little calmer, one small area at a time.",
     category: "Daily life",
     duration: "10 min",
     difficulty: "Quick win",
     encouragement: "A little less mess is still progress.",
     steps: [
-      {
-        title: "Choose one small area",
-        description: "Pick a desk, bedside table, or one corner of a room.",
-        duration: "1 min",
-      },
-      {
-        title: "Clear away five things",
-        description: "Put away, throw out, or move five items.",
-        duration: "4 min",
-      },
-      {
-        title: "Make the space usable",
-        description: "Put back what you need and take a breath.",
-        duration: "5 min",
-      },
+      { title: "Choose one small area", description: "Pick a desk, bedside table, or one corner of a room.", duration: "1 min" },
+      { title: "Clear away five things", description: "Put away, throw out, or move five items.", duration: "4 min" },
+      { title: "Make the space usable", description: "Put back what you need and take a breath.", duration: "5 min" },
     ],
   },
   3: {
     title: "Get your day together",
-    description:
-      "Choose what matters today without trying to do everything at once.",
+    description: "Choose what matters today without trying to do everything at once.",
     category: "Planning",
     duration: "5 min",
     difficulty: "Gentle start",
     encouragement: "Your whole life doesn't need solving today.",
     steps: [
-      {
-        title: "Brain-dump your tasks",
-        description: "Write down what is currently taking up mental space.",
-        duration: "2 min",
-      },
-      {
-        title: "Choose one priority",
-        description: "Pick the task that matters most today.",
-        duration: "1 min",
-      },
-      {
-        title: "Choose your starting action",
-        description: "Decide on one tiny action you can take next.",
-        duration: "2 min",
-      },
+      { title: "Brain-dump your tasks", description: "Write down what is currently taking up mental space.", duration: "2 min" },
+      { title: "Choose one priority", description: "Pick the task that matters most today.", duration: "1 min" },
+      { title: "Choose your starting action", description: "Decide on one tiny action you can take next.", duration: "2 min" },
     ],
   },
   4: {
     title: "Take care of yourself",
-    description:
-      "Make space for one small thing that helps you feel looked after.",
+    description: "Make space for one small thing that helps you feel looked after.",
     category: "Wellbeing",
     duration: "10 min",
     difficulty: "At your pace",
     encouragement: "You deserve care even when your to-do list isn't finished.",
     steps: [
-      {
-        title: "Check in with yourself",
-        description: "Notice what you might need right now.",
-        duration: "2 min",
-      },
-      {
-        title: "Choose one act of care",
-        description: "Get a drink, have a snack, stretch, or rest for a moment.",
-        duration: "5 min",
-      },
-      {
-        title: "Give yourself a moment",
-        description: "Pause without needing to earn the break.",
-        duration: "3 min",
-      },
+      { title: "Check in with yourself", description: "Notice what you might need right now.", duration: "2 min" },
+      { title: "Choose one act of care", description: "Get a drink, have a snack, stretch, or rest for a moment.", duration: "5 min" },
+      { title: "Give yourself a moment", description: "Pause without needing to earn the break.", duration: "3 min" },
     ],
   },
 };
 
+const PROGRESS_KEY = "trajectoryMissionProgress";
+
+function getSavedProgress() {
+  try {
+    return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
 function MissionDetail() {
   const { id } = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
 
-  const mission =
-    missionDetails[id] || location.state?.mission || missionDetails[1];
+  const mission = missionDetails[id];
 
-  const [completedSteps, setCompletedSteps] = useState([]);
+  const [completedSteps, setCompletedSteps] = useState(() => {
+    const saved = getSavedProgress();
+    return saved[id]?.completedSteps || [];
+  });
+
+  useEffect(() => {
+    const saved = getSavedProgress();
+
+    saved[id] = {
+      completedSteps,
+      completed: completedSteps.length === mission?.steps.length,
+    };
+
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(saved));
+  }, [completedSteps, id, mission]);
+
+  if (!mission) {
+    return (
+      <main className="mission-detail-page">
+        <div className="mission-detail-container">
+          <h1>Mission not found</h1>
+          <button className="detail-primary-button" onClick={() => navigate("/missions")}>
+            Back to missions
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   const totalSteps = mission.steps.length;
   const completedCount = completedSteps.length;
@@ -141,36 +125,27 @@ function MissionDetail() {
     );
   }
 
+  function resetMission() {
+    setCompletedSteps([]);
+  }
+
   return (
     <main className="mission-detail-page">
       <div className="mission-detail-container">
-        <button
-          className="detail-back-button"
-          onClick={() => navigate("/missions")}
-        >
+        <button className="detail-back-button" onClick={() => navigate("/missions")}>
           <FiArrowLeft />
           <span>Back to missions</span>
         </button>
 
         <section className="detail-hero">
           <div className="detail-hero-content">
-            <span className="detail-eyebrow">
-              {mission.category} MISSION
-            </span>
-
+            <span className="detail-eyebrow">{mission.category} MISSION</span>
             <h1>{mission.title}</h1>
-
             <p className="detail-description">{mission.description}</p>
 
             <div className="detail-meta">
-              <span>
-                <FiClock />
-                {mission.duration}
-              </span>
-              <span>
-                <FiTarget />
-                {mission.difficulty}
-              </span>
+              <span><FiClock /> {mission.duration}</span>
+              <span><FiTarget /> {mission.difficulty}</span>
             </div>
           </div>
 
@@ -203,10 +178,7 @@ function MissionDetail() {
             aria-valuemin={0}
             aria-valuemax={totalSteps}
           >
-            <div
-              className="detail-progress-fill"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="detail-progress-fill" style={{ width: `${progress}%` }} />
           </div>
 
           <p className="detail-progress-caption">
@@ -222,25 +194,23 @@ function MissionDetail() {
               <FiCheckCircle />
             </div>
 
-            <h2>You did the thing ! </h2>
+            <h2>You did the thing!</h2>
 
             <p>
-              You made it through this mission, one step at a time. Take a
-              moment to appreciate that.
+              You made it through this mission, one step at a time.
+              Take a moment to appreciate that.
             </p>
 
-            <button
-              className="detail-primary-button"
-              onClick={() => navigate("/missions")}
-            >
-              Explore more missions
-              <FiArrowRight />
+            <div className="mission-xp-reward">
+              <FiZap />
+              <strong>30 XP earned</strong>
+            </div>
+
+            <button className="detail-primary-button" onClick={() => navigate("/missions")}>
+              Explore more missions <FiArrowRight />
             </button>
 
-            <button
-              className="detail-reset-button"
-              onClick={() => setCompletedSteps([])}
-            >
+            <button className="detail-reset-button" onClick={resetMission}>
               Start this mission again
             </button>
           </section>
@@ -251,8 +221,7 @@ function MissionDetail() {
                 <span className="detail-small-label">YOUR NEXT MOVES</span>
                 <h2>Let's make it manageable.</h2>
                 <p>
-                  No need to think about everything at once. Focus on the
-                  next step.
+                  No need to think about everything at once. Focus on the next step.
                 </p>
               </div>
 
@@ -268,27 +237,20 @@ function MissionDetail() {
                       <button
                         className="detail-step-check"
                         onClick={() => toggleStep(index)}
-                        aria-label={
-                          checked
-                            ? `Mark ${step.title} as incomplete`
-                            : `Mark ${step.title} as complete`
-                        }
+                        aria-label={checked ? `Mark ${step.title} as incomplete` : `Mark ${step.title} as complete`}
                         aria-pressed={checked}
                       >
                         {checked && <FiCheck />}
                       </button>
 
                       <div className="detail-step-content">
-                        <span className="detail-step-number">
-                          STEP {index + 1}
-                        </span>
+                        <span className="detail-step-number">STEP {index + 1}</span>
                         <h3>{step.title}</h3>
                         <p>{step.description}</p>
                       </div>
 
                       <span className="detail-step-duration">
-                        <FiClock />
-                        {step.duration}
+                        <FiClock /> {step.duration}
                       </span>
                     </article>
                   );

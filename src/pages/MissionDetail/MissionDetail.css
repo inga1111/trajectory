@@ -397,3 +397,15 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+.mission-xp-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 24px;
+  padding: 11px 18px;
+  border-radius: 30px;
+  background: #fff1cf;
+  color: #8b6424;
+  font-size: 14px;
+}
