@@ -75,15 +75,24 @@ function Questionnaire() {
   }
 
   function handleNext() {
-    if (!selectedAnswer) return;
-
     if (currentQuestion === questions.length - 1) {
-      navigate("/loading");
-      return;
-    }
+  const onboardingData = {
+    answers: questions.map((item, index) => ({
+      question: item.question,
+      answer: answers[index],
+    })),
+    completed: true,
+    completedAt: new Date().toISOString(),
+  };
 
-    setCurrentQuestion(currentQuestion + 1);
-  }
+  localStorage.setItem(
+    "trajectoryOnboarding",
+    JSON.stringify(onboardingData)
+  );
+
+  navigate("/loading");
+  return;
+}
 
   function handleBack() {
     if (currentQuestion === 0) {
