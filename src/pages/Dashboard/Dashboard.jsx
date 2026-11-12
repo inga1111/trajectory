@@ -1,3 +1,5 @@
+
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FiHome,
@@ -5,27 +7,74 @@ import {
   FiBarChart2,
   FiSettings,
   FiArrowRight,
-  FiCheck,
   FiPlus,
+  FiClock,
+  FiHeart,
+  FiZap,
 } from "react-icons/fi";
 import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
 
+  const profile = useMemo(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("trajectoryProfile") || "null"
+      );
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const firstName =
+    localStorage.getItem("trajectoryName") || "there";
+
+  const today = new Date();
+  const greeting =
+    today.getHours() < 12
+      ? "Good morning"
+      : today.getHours() < 18
+      ? "Good afternoon"
+      : "Good evening";
+
+  const date = today.toLocaleDateString("en-ZA", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  const profileItems = [
+    {
+      icon: <FiTarget />,
+      label: "Main challenge",
+      value: profile?.mainChallenge || "Not yet identified",
+    },
+    {
+      icon: <FiZap />,
+      label: "Preferred approach",
+      value: profile?.preferredApproach || "Not yet identified",
+    },
+    {
+      icon: <FiClock />,
+      label: "Working style",
+      value: profile?.workStyle || "Not yet identified",
+    },
+    {
+      icon: <FiHeart />,
+      label: "Motivation",
+      value: profile?.motivationStyle || "Not yet identified",
+    },
+  ];
+
   return (
     <main className="dashboard-page">
-
-      {/* SIDEBAR */}
-
       <aside className="dashboard-sidebar">
-
         <Link to="/" className="dashboard-logo">
           trajectory.
         </Link>
 
         <nav className="dashboard-nav">
-
           <Link to="/dashboard" className="nav-item active">
             <FiHome />
             <span>Today</span>
@@ -40,45 +89,34 @@ function Dashboard() {
             <FiBarChart2 />
             <span>Progress</span>
           </a>
-
         </nav>
 
         <div className="sidebar-bottom">
-
-          <a href="#settings" className="nav-item">
+          <a href="#profile" className="nav-item">
             <FiSettings />
-            <span>Settings</span>
+            <span>My profile</span>
           </a>
 
           <div className="profile-mini">
             <div className="profile-avatar">
-              I
+              {firstName.charAt(0).toUpperCase()}
             </div>
 
             <div>
-              <strong>Inga</strong>
+              <strong>{firstName}</strong>
               <span>Your trajectory</span>
             </div>
           </div>
-
         </div>
-
       </aside>
 
-
-      {/* MAIN CONTENT */}
-
       <section className="dashboard-main">
-
         <header className="dashboard-header">
-
           <div>
-            <p className="dashboard-eyebrow">
-              TUESDAY, 22 SEPTEMBER
-            </p>
+            <p className="dashboard-eyebrow">{date}</p>
 
             <h1>
-              Good morning, Inga.
+              {greeting}, {firstName}.
             </h1>
 
             <p>
@@ -93,246 +131,128 @@ function Dashboard() {
             <FiPlus />
             New mission
           </button>
-
         </header>
 
-
-        {/* MOMENTUM CARD */}
-
         <section className="momentum-card">
-
           <div className="momentum-copy">
-
-            <span className="card-label">
-              YOUR MOMENTUM
-            </span>
+            <span className="card-label">YOUR TRAJECTORY</span>
 
             <h2>
-              You're already
-              <span> moving.</span>
+              Progress at
+              <span> your pace.</span>
             </h2>
 
             <p>
-              You've completed 4 tasks this week.
-              Keep the momentum going — no need to
-              do everything at once.
+              You don't need to do everything at once.
+              Your journey starts with one manageable step.
             </p>
 
             <Link to="/missions" className="text-link">
-              View your missions
+              Explore your missions
               <FiArrowRight />
             </Link>
-
           </div>
 
           <div className="momentum-circle">
-            <strong>68%</strong>
-            <span>momentum</span>
+            <strong>0</strong>
+            <span>tasks complete</span>
           </div>
-
         </section>
 
-
-        {/* TODAY + SIDE CARDS */}
-
         <div className="dashboard-grid">
-
-          {/* TODAY'S FOCUS */}
-
-          <section className="today-card">
-
+          <section className="today-card" id="profile">
             <div className="section-heading">
               <div>
                 <span className="card-label">
-                  TODAY'S FOCUS
+                  YOUR PRODUCTIVITY PROFILE
                 </span>
 
-                <h2>
-                  One thing at a time.
-                </h2>
+                <h2>How you work best.</h2>
               </div>
-
-              <span className="task-count">
-                2 / 4
-              </span>
             </div>
 
+            {profile ? (
+              <div className="task-list">
+                {profileItems.map((item) => (
+                  <div className="task profile-task" key={item.label}>
+                    <div className="profile-task-icon">
+                      {item.icon}
+                    </div>
 
-            <div className="task-list">
-
-              <div className="task completed">
-
-                <div className="task-check">
-                  <FiCheck />
-                </div>
-
-                <div className="task-info">
-                  <strong>
-                    Check assignment brief
-                  </strong>
-
-                  <span>
-                    10 min · University
-                  </span>
-                </div>
-
+                    <div className="task-info">
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-
-              <div className="task completed">
-
-                <div className="task-check">
-                  <FiCheck />
-                </div>
-
-                <div className="task-info">
-                  <strong>
-                    Gather research notes
-                  </strong>
-
-                  <span>
-                    20 min · University
-                  </span>
-                </div>
-
+            ) : (
+              <div className="profile-empty">
+                <h3>Your profile is waiting.</h3>
+                <p>
+                  Complete your onboarding questionnaire so
+                  Trajectory can personalise your experience.
+                </p>
+                <button
+                  className="profile-action"
+                  onClick={() => navigate("/questionnaire")}
+                >
+                  Complete questionnaire <FiArrowRight />
+                </button>
               </div>
-
-
-              <div className="task current">
-
-                <div className="task-check"></div>
-
-                <div className="task-info">
-                  <strong>
-                    Write first paragraph
-                  </strong>
-
-                  <span>
-                    25 min · Your next step
-                  </span>
-                </div>
-
-                <FiArrowRight className="task-arrow" />
-
-              </div>
-
-
-              <div className="task">
-
-                <div className="task-check"></div>
-
-                <div className="task-info">
-                  <strong>
-                    Take a proper break
-                  </strong>
-
-                  <span>
-                    15 min · Reset
-                  </span>
-                </div>
-
-              </div>
-
-            </div>
-
+            )}
           </section>
 
-
-          {/* RIGHT COLUMN */}
-
           <div className="dashboard-side">
-
-
-            {/* QUICK WIN */}
-
-            <section className="quick-win-card">
-
+            <section className="weekly-card">
               <span className="card-label">
-                QUICK WIN
+                YOUR RECOMMENDED ROUTINE
               </span>
 
-              <h3>
-                Do something tiny.
+              <h3 className="routine-time">
+                {profile?.recommendedSessionLength || "25 minutes"}
               </h3>
 
-              <p>
-                Clear one thing from your
-                environment before you start.
+              <p className="routine-description">
+                Suggested focus session
               </p>
 
-              <button>
-                I'm doing it
-                <FiArrowRight />
-              </button>
+              <div className="routine-divider" />
 
+              <span className="card-label">
+                PLANNING APPROACH
+              </span>
+
+              <p className="routine-value">
+                {profile?.planningStyle
+                  ? profile.planningStyle.replaceAll("-", " ")
+                  : "Balanced"}
+              </p>
+
+              <p className="routine-description">
+                Based on your onboarding answers.
+              </p>
             </section>
-
-
-            {/* WEEKLY PROGRESS */}
 
             <section className="weekly-card" id="progress">
+              <span className="card-label">YOUR NEXT STEP</span>
 
-              <div className="weekly-heading">
-                <span className="card-label">
-                  THIS WEEK
-                </span>
+              <h3>Ready for a mission?</h3>
 
-                <span>4 / 7 days</span>
-              </div>
+              <p className="routine-description">
+                Turn something you've been putting off into
+                smaller, more manageable steps.
+              </p>
 
-              <div className="week-days">
-
-                <div className="day completed-day">
-                  <span>M</span>
-                  <i>✓</i>
-                </div>
-
-                <div className="day completed-day">
-                  <span>T</span>
-                  <i>✓</i>
-                </div>
-
-                <div className="day today-day">
-                  <span>W</span>
-                  <i></i>
-                </div>
-
-                <div className="day">
-                  <span>T</span>
-                  <i></i>
-                </div>
-
-                <div className="day">
-                  <span>F</span>
-                  <i></i>
-                </div>
-
-                <div className="day">
-                  <span>S</span>
-                  <i></i>
-                </div>
-
-                <div className="day">
-                  <span>S</span>
-                  <i></i>
-                </div>
-
-              </div>
-
+              <Link to="/missions" className="text-link">
+                View missions <FiArrowRight />
+              </Link>
             </section>
-
           </div>
-
         </div>
 
-
-        {/* PERSONALIZED MESSAGE */}
-
         <section className="trajectory-message">
-
-          <div className="message-symbol">
-            ✦
-          </div>
+          <div className="message-symbol">✦</div>
 
           <div>
             <span className="card-label">
@@ -340,16 +260,12 @@ function Dashboard() {
             </span>
 
             <p>
-              You don't have to finish everything today.
-              Starting is enough. Once you're moving,
-              the rest gets easier.
+              {profile?.encouragement ||
+                "You don't have to finish everything today. Starting is enough."}
             </p>
           </div>
-
         </section>
-
       </section>
-
     </main>
   );
 }
