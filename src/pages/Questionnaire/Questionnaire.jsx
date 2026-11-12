@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Questionnaire.css";
@@ -75,24 +76,29 @@ function Questionnaire() {
   }
 
   function handleNext() {
+    if (!selectedAnswer) return;
+
     if (currentQuestion === questions.length - 1) {
-  const onboardingData = {
-    answers: questions.map((item, index) => ({
-      question: item.question,
-      answer: answers[index],
-    })),
-    completed: true,
-    completedAt: new Date().toISOString(),
-  };
+      const onboardingData = {
+        answers: questions.map((item, index) => ({
+          question: item.question,
+          answer: answers[index],
+        })),
+        completed: true,
+        completedAt: new Date().toISOString(),
+      };
 
-  localStorage.setItem(
-    "trajectoryOnboarding",
-    JSON.stringify(onboardingData)
-  );
+      localStorage.setItem(
+        "trajectoryOnboarding",
+        JSON.stringify(onboardingData)
+      );
 
-  navigate("/loading");
-  return;
-}
+      navigate("/loading");
+      return;
+    }
+
+    setCurrentQuestion((previous) => previous + 1);
+  }
 
   function handleBack() {
     if (currentQuestion === 0) {
@@ -100,7 +106,7 @@ function Questionnaire() {
       return;
     }
 
-    setCurrentQuestion(currentQuestion - 1);
+    setCurrentQuestion((previous) => previous - 1);
   }
 
   const progress =
@@ -108,7 +114,6 @@ function Questionnaire() {
 
   return (
     <main className="questionnaire-page">
-
       <nav className="questionnaire-nav">
         <Link to="/" className="logo">
           trajectory.
@@ -127,7 +132,6 @@ function Questionnaire() {
       </div>
 
       <section className="questionnaire-content">
-
         <div className="question-number">
           0{currentQuestion + 1}
         </div>
@@ -142,6 +146,7 @@ function Questionnaire() {
           {question.options.map((option, index) => (
             <button
               key={option}
+              type="button"
               className={`answer-option ${
                 selectedAnswer === option ? "selected" : ""
               }`}
@@ -159,8 +164,8 @@ function Questionnaire() {
         </div>
 
         <div className="question-actions">
-
           <button
+            type="button"
             className="back-button"
             onClick={handleBack}
           >
@@ -168,20 +173,19 @@ function Questionnaire() {
           </button>
 
           <button
+            type="button"
             className={`continue-button ${
               selectedAnswer ? "active" : ""
             }`}
             onClick={handleNext}
+            disabled={!selectedAnswer}
           >
             {currentQuestion === questions.length - 1
               ? "Build my trajectory"
               : "Continue →"}
           </button>
-
         </div>
-
       </section>
-
     </main>
   );
 }
