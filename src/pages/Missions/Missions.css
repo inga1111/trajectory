@@ -367,3 +367,7 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+a.mission-open-button {
+  text-decoration: none;
+}
