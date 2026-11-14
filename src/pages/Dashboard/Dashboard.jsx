@@ -12,6 +12,7 @@ import {
   FiHeart,
   FiZap,
   FiX,
+  FiAward,
 } from "react-icons/fi";
 import "./Dashboard.css";
 
@@ -271,6 +272,11 @@ function Dashboard() {
           <Link to="/missions" className="nav-item">
             <FiTarget />
             <span>Missions</span>
+          </Link>
+
+          <Link to="/rewards" className="nav-item">
+            <FiAward />
+            <span>Rewards</span>
           </Link>
 
           <a href="#progress" className="nav-item">

@@ -1,0 +1,427 @@
+
+.rewards-page {
+  min-height: 100vh;
+  padding: 40px 24px 80px;
+  background: #faf9fd;
+  color: #302b3b;
+}
+
+.rewards-container {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.rewards-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #756b86;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 42px;
+  transition: color 0.2s ease;
+}
+
+.rewards-back:hover {
+  color: #9876df;
+}
+
+.rewards-header {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.rewards-eyebrow {
+  display: block;
+  color: #9876df;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 13px;
+}
+
+.rewards-header-icon {
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+  background: #eee7fb;
+  color: #9876df;
+  font-size: 29px;
+}
+
+.rewards-header h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 48px);
+  letter-spacing: -1.8px;
+  color: #302b3b;
+}
+
+.rewards-header p {
+  max-width: 440px;
+  margin: 12px auto 0;
+  color: #898294;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.rewards-level-card {
+  padding: 30px;
+  border-radius: 25px;
+  background: linear-gradient(125deg, #8061c8, #a48ae2);
+  color: white;
+  box-shadow: 0 14px 35px rgba(126, 94, 194, 0.16);
+}
+
+.rewards-level-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.rewards-card-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  opacity: 0.8;
+}
+
+.rewards-level-top h2 {
+  margin: 8px 0 5px;
+  font-size: 30px;
+}
+
+.rewards-level-top p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.82;
+}
+
+.rewards-level-icon {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 19px;
+  background: rgba(255, 255, 255, 0.17);
+  font-size: 28px;
+}
+
+.rewards-xp-total {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin: 27px 0 14px;
+}
+
+.rewards-xp-total strong {
+  font-size: 36px;
+  letter-spacing: -1px;
+}
+
+.rewards-xp-total span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  opacity: 0.8;
+}
+
+.rewards-progress-track {
+  height: 11px;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.rewards-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #fff;
+  transition: width 0.8s ease;
+}
+
+.rewards-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 11px;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.rewards-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+  margin: 20px 0 55px;
+}
+
+.rewards-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 23px;
+  border: 1px solid #eeeaf4;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.rewards-stat-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  font-size: 18px;
+}
+
+.rewards-stat-icon.purple {
+  background: #f0eafd;
+  color: #9876df;
+}
+
+.rewards-stat-icon.gold {
+  background: #fff5df;
+  color: #d5a43f;
+}
+
+.rewards-stat-card strong {
+  font-size: 25px;
+  color: #393345;
+}
+
+.rewards-stat-card > span:last-child {
+  margin-top: 4px;
+  color: #938c9e;
+  font-size: 12px;
+}
+
+.rewards-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.rewards-section-heading .rewards-eyebrow {
+  margin-bottom: 8px;
+}
+
+.rewards-section-heading h2 {
+  margin: 0;
+  font-size: 25px;
+  letter-spacing: -0.7px;
+}
+
+.rewards-section-heading p {
+  margin: 7px 0 0;
+  color: #938c9e;
+  font-size: 13px;
+}
+
+.rewards-collection-count {
+  padding: 9px 12px;
+  border-radius: 30px;
+  background: #eee8fa;
+  color: #8869c9;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.rewards-achievement-card {
+  padding: 22px;
+  border: 1px solid #eeeaf4;
+  border-radius: 21px;
+  background: #fff;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.rewards-achievement-card.achievement-unlocked:hover {
+  transform: translateY(-4px);
+  border-color: #d9c9f7;
+  box-shadow: 0 12px 25px rgba(115, 87, 170, 0.09);
+}
+
+.rewards-achievement-card.achievement-locked {
+  background: #f8f7fa;
+}
+
+.rewards-achievement-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rewards-achievement-icon {
+  width: 57px;
+  height: 57px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: #f0eafd;
+  font-size: 29px;
+}
+
+.achievement-locked .rewards-achievement-icon {
+  background: #eeedf0;
+  color: #aaa4b2;
+  font-size: 21px;
+}
+
+.achievement-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.achievement-status.unlocked {
+  background: #edf8f3;
+  color: #459778;
+}
+
+.achievement-status.locked {
+  background: #efedf1;
+  color: #9992a1;
+}
+
+.rewards-achievement-info {
+  margin-top: 20px;
+}
+
+.achievement-category {
+  color: #9876df;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.achievement-locked .achievement-category {
+  color: #aaa4b2;
+}
+
+.rewards-achievement-info h3 {
+  margin: 7px 0;
+  color: #393345;
+  font-size: 18px;
+}
+
+.achievement-locked .rewards-achievement-info h3 {
+  color: #8c8694;
+}
+
+.rewards-achievement-info p {
+  min-height: 38px;
+  margin: 0;
+  color: #938c9e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.rewards-achievement-requirement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 19px;
+  padding-top: 14px;
+  border-top: 1px solid #f0edf4;
+  color: #81798e;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rewards-achievement-requirement svg {
+  color: #a38ad7;
+  font-size: 14px;
+}
+
+.rewards-encouragement {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 35px;
+  padding: 23px;
+  border-radius: 20px;
+  background: #f1ecfb;
+}
+
+.rewards-encouragement > span {
+  font-size: 29px;
+}
+
+.rewards-encouragement h3 {
+  margin: 0 0 5px;
+  color: #51436f;
+  font-size: 14px;
+}
+
+.rewards-encouragement p {
+  margin: 0;
+  color: #827695;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 650px) {
+  .rewards-page {
+    padding: 25px 17px 55px;
+  }
+
+  .rewards-back {
+    margin-bottom: 30px;
+  }
+
+  .rewards-level-card {
+    padding: 23px;
+  }
+
+  .rewards-stats {
+    gap: 11px;
+    margin-bottom: 42px;
+  }
+
+  .rewards-stat-card {
+    padding: 17px;
+  }
+
+  .rewards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rewards-section-heading {
+    align-items: flex-start;
+  }
+
+  .rewards-collection-count {
+    font-size: 9px;
+  }
+}

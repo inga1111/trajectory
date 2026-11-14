@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Missions from "./pages/Missions/Missions";
 import MissionDetail from "./pages/MissionDetail/MissionDetail";
 import AddMission from "./pages/AddMission/AddMission";
+import Rewards from "./pages/Rewards/Rewards";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/missions" element={<Missions />} />
         <Route path="/missions/new" element={<AddMission />} />
         <Route path="/missions/:id" element={<MissionDetail />} />
+        <Route path="/rewards" element={<Rewards />} />
       </Routes>
     </BrowserRouter>
   );
