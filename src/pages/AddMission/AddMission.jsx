@@ -38,9 +38,13 @@ function AddMission() {
   function updateStep(index, field, value) {
     setSteps((currentSteps) =>
       currentSteps.map((step, stepIndex) =>
-        stepIndex === index ? { ...step, [field]: value } : step
+        stepIndex === index
+          ? { ...step, [field]: value }
+          : step
       )
     );
+
+    setError("");
   }
 
   function addStep() {
@@ -52,53 +56,77 @@ function AddMission() {
         duration: "5 min",
       },
     ]);
+    setError("");
   }
 
   function removeStep(index) {
     setSteps((currentSteps) =>
       currentSteps.filter((_, stepIndex) => stepIndex !== index)
     );
+    setError("");
   }
 
   function handleSave(event) {
     event.preventDefault();
+    setError("");
 
     if (!title.trim()) {
       setError("Give your mission a name before saving.");
       return;
     }
 
-    const validSteps = steps.filter((step) => step.title.trim());
+    // Ignore empty step rows, but keep every step with a title.
+    const validSteps = steps
+      .filter((step) => step.title.trim().length > 0)
+      .map((step) => ({
+        title: step.title.trim(),
+        description: step.description.trim(),
+        duration: step.duration.trim() || "5 min",
+      }));
 
     if (validSteps.length === 0) {
-      setError("Add at least one step to your mission.");
+      setError("Add at least one named step to your mission.");
       return;
     }
 
     const mission = {
       id: `mission-${Date.now()}`,
       title: title.trim(),
-      description: description.trim() || "A personal mission, broken into manageable steps.",
+      description:
+        description.trim() ||
+        "A personal mission, broken into manageable steps.",
       category,
       duration: `${validSteps.length} steps`,
       difficulty: "Your own pace",
       encouragement: "You've got this. One step at a time.",
-      steps: validSteps.map((step) => ({
-        title: step.title.trim(),
-        description: step.description.trim(),
-        duration: step.duration,
-      })),
+      steps: validSteps,
       createdAt: new Date().toISOString(),
     };
 
     try {
-      const existingMissions = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || "[]"
-      );
+      const storedMissions = localStorage.getItem(STORAGE_KEY);
+      const existingMissions = storedMissions
+        ? JSON.parse(storedMissions)
+        : [];
+
+      if (!Array.isArray(existingMissions)) {
+        throw new Error("Saved missions data is not valid.");
+      }
 
       const updatedMissions = [...existingMissions, mission];
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMissions));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(updatedMissions)
+      );
+
+      // Tell the dashboard and missions page to refresh.
+      window.dispatchEvent(
+        new Event("trajectoryMissionsUpdated")
+      );
+
+      // The first mission has now been created.
+      localStorage.removeItem("trajectoryMissionPromptDismissed");
 
       navigate("/missions");
     } catch (storageError) {
@@ -121,6 +149,7 @@ function AddMission() {
 
         <header className="add-mission-heading">
           <span className="add-mission-eyebrow">MAKE IT HAPPEN</span>
+
           <div className="add-mission-title-row">
             <div>
               <h1>Create a new mission.</h1>
@@ -129,6 +158,7 @@ function AddMission() {
                 Let's break it down.
               </p>
             </div>
+
             <span className="add-mission-main-icon">
               <FiTarget />
             </span>
@@ -150,12 +180,17 @@ function AddMission() {
               id="mission-title"
               type="text"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                setError("");
+              }}
               placeholder="e.g. Finish my research assignment"
               maxLength={100}
             />
 
-            <label htmlFor="mission-description">A little more detail</label>
+            <label htmlFor="mission-description">
+              A little more detail
+            </label>
             <textarea
               id="mission-description"
               value={description}
@@ -185,15 +220,18 @@ function AddMission() {
               <div>
                 <h2>Break it into steps.</h2>
                 <p>
-                  We've added a few starter steps. Edit them to suit your
-                  mission, or add your own.
+                  We've added a few starter steps. Edit them to suit
+                  your mission, or add your own.
                 </p>
               </div>
             </div>
 
             <div className="add-mission-steps">
               {steps.map((step, index) => (
-                <article className="add-mission-step" key={index}>
+                <article
+                  className="add-mission-step"
+                  key={index}
+                >
                   <div className="add-mission-step-number">
                     {String(index + 1).padStart(2, "0")}
                   </div>
@@ -202,6 +240,7 @@ function AddMission() {
                     <label htmlFor={`step-title-${index}`}>
                       Step {index + 1}
                     </label>
+
                     <input
                       id={`step-title-${index}`}
                       type="text"
@@ -215,7 +254,11 @@ function AddMission() {
                     <textarea
                       value={step.description}
                       onChange={(event) =>
-                        updateStep(index, "description", event.target.value)
+                        updateStep(
+                          index,
+                          "description",
+                          event.target.value
+                        )
                       }
                       placeholder="Optional: add a little guidance"
                       rows={2}
@@ -226,7 +269,11 @@ function AddMission() {
                       type="text"
                       value={step.duration}
                       onChange={(event) =>
-                        updateStep(index, "duration", event.target.value)
+                        updateStep(
+                          index,
+                          "duration",
+                          event.target.value
+                        )
                       }
                       placeholder="Estimated time, e.g. 10 min"
                       aria-label={`Estimated time for step ${index + 1}`}
@@ -256,7 +303,11 @@ function AddMission() {
             </button>
           </section>
 
-          {error && <p className="add-mission-error">{error}</p>}
+          {error && (
+            <p className="add-mission-error" role="alert">
+              {error}
+            </p>
+          )}
 
           <div className="add-mission-actions">
             <button
@@ -267,7 +318,10 @@ function AddMission() {
               Cancel
             </button>
 
-            <button type="submit" className="add-mission-submit">
+            <button
+              type="submit"
+              className="add-mission-submit"
+            >
               Create my mission
               <FiArrowLeft className="add-mission-submit-icon" />
             </button>

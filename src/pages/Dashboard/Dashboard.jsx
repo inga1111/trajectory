@@ -65,10 +65,7 @@ function Dashboard() {
       setMissions(updatedMissions);
       setProgress(updatedProgress);
 
-      if (
-        updatedMissions.length > 0 &&
-        showMissionPrompt
-      ) {
+      if (updatedMissions.length > 0) {
         setShowMissionPrompt(false);
       }
     };
@@ -98,7 +95,7 @@ function Dashboard() {
 
       window.removeEventListener("storage", refreshDashboard);
     };
-  }, [showMissionPrompt]);
+  }, []);
 
   const dismissMissionPrompt = () => {
     localStorage.setItem(
@@ -206,12 +203,7 @@ function Dashboard() {
               <FiX />
             </button>
 
-            <div
-              style={{
-                fontSize: "42px",
-                marginBottom: "14px",
-              }}
-            >
+            <div style={{ fontSize: "42px", marginBottom: "14px" }}>
               ✦
             </div>
 
@@ -219,12 +211,7 @@ function Dashboard() {
               YOUR JOURNEY STARTS HERE
             </span>
 
-            <h2
-              style={{
-                fontSize: "26px",
-                margin: "12px 0",
-              }}
-            >
+            <h2 style={{ fontSize: "26px", margin: "12px 0" }}>
               Ready for your first mission?
             </h2>
 
@@ -355,12 +342,10 @@ function Dashboard() {
           </div>
 
           <div className="momentum-circle">
-            <strong>{completedMissions}</strong>
-            <span>
-              {completedMissions === 1
-                ? "mission complete"
-                : "missions complete"}
-            </span>
+            <strong>
+              {completedMissions} / {totalMissions}
+            </strong>
+            <span>missions complete</span>
           </div>
         </section>
 
