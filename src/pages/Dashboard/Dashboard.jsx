@@ -1,5 +1,5 @@
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FiHome,
@@ -11,26 +11,121 @@ import {
   FiClock,
   FiHeart,
   FiZap,
+  FiX,
 } from "react-icons/fi";
 import "./Dashboard.css";
+
+function readStorage(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
+}
 
 function Dashboard() {
   const navigate = useNavigate();
 
-  const profile = useMemo(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("trajectoryProfile") || "null"
-      );
-    } catch {
-      return null;
-    }
-  }, []);
+  const [profile] = useState(() =>
+    readStorage("trajectoryProfile", null)
+  );
+
+  const [missions, setMissions] = useState(() =>
+    readStorage("trajectoryMissions", [])
+  );
+
+  const [progress, setProgress] = useState(() =>
+    readStorage("trajectoryMissionProgress", {})
+  );
+
+  const [showMissionPrompt, setShowMissionPrompt] = useState(() => {
+    const savedProfile = readStorage("trajectoryProfile", null);
+    const savedMissions = readStorage("trajectoryMissions", []);
+    const dismissed =
+      localStorage.getItem("trajectoryMissionPromptDismissed") === "true";
+
+    return Boolean(
+      savedProfile &&
+      savedMissions.length === 0 &&
+      !dismissed
+    );
+  });
 
   const firstName =
     localStorage.getItem("trajectoryName") || "there";
 
+  useEffect(() => {
+    const refreshDashboard = () => {
+      const updatedMissions = readStorage("trajectoryMissions", []);
+      const updatedProgress = readStorage(
+        "trajectoryMissionProgress",
+        {}
+      );
+
+      setMissions(updatedMissions);
+      setProgress(updatedProgress);
+
+      if (
+        updatedMissions.length > 0 &&
+        showMissionPrompt
+      ) {
+        setShowMissionPrompt(false);
+      }
+    };
+
+    window.addEventListener(
+      "trajectoryMissionsUpdated",
+      refreshDashboard
+    );
+
+    window.addEventListener(
+      "trajectoryProgressUpdated",
+      refreshDashboard
+    );
+
+    window.addEventListener("storage", refreshDashboard);
+
+    return () => {
+      window.removeEventListener(
+        "trajectoryMissionsUpdated",
+        refreshDashboard
+      );
+
+      window.removeEventListener(
+        "trajectoryProgressUpdated",
+        refreshDashboard
+      );
+
+      window.removeEventListener("storage", refreshDashboard);
+    };
+  }, [showMissionPrompt]);
+
+  const dismissMissionPrompt = () => {
+    localStorage.setItem(
+      "trajectoryMissionPromptDismissed",
+      "true"
+    );
+    setShowMissionPrompt(false);
+  };
+
+  const totalMissions = missions.length;
+
+  const completedMissions = missions.filter(
+    (mission) => progress[mission.id]?.completed === true
+  ).length;
+
+  const totalSteps = missions.reduce(
+    (total, mission) => total + (mission.steps?.length || 0),
+    0
+  );
+
+  const completedSteps = missions.reduce((total, mission) => {
+    const missionProgress = progress[mission.id];
+    return total + (missionProgress?.completedSteps?.length || 0);
+  }, 0);
+
   const today = new Date();
+
   const greeting =
     today.getHours() < 12
       ? "Good morning"
@@ -69,6 +164,112 @@ function Dashboard() {
 
   return (
     <main className="dashboard-page">
+      {showMissionPrompt && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(20, 15, 35, 0.65)",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              background: "#fff",
+              borderRadius: "24px",
+              padding: "40px",
+              width: "100%",
+              maxWidth: "460px",
+              textAlign: "center",
+              boxShadow: "0 20px 70px rgba(0,0,0,0.2)",
+            }}
+          >
+            <button
+              onClick={dismissMissionPrompt}
+              aria-label="Close"
+              style={{
+                position: "absolute",
+                top: "18px",
+                right: "18px",
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                fontSize: "20px",
+              }}
+            >
+              <FiX />
+            </button>
+
+            <div
+              style={{
+                fontSize: "42px",
+                marginBottom: "14px",
+              }}
+            >
+              ✦
+            </div>
+
+            <span className="card-label">
+              YOUR JOURNEY STARTS HERE
+            </span>
+
+            <h2
+              style={{
+                fontSize: "26px",
+                margin: "12px 0",
+              }}
+            >
+              Ready for your first mission?
+            </h2>
+
+            <p
+              style={{
+                color: "#777",
+                lineHeight: 1.6,
+                marginBottom: "26px",
+              }}
+            >
+              Choose something you've been meaning to do.
+              We'll help you turn it into smaller, more
+              manageable steps.
+            </p>
+
+            <button
+              className="add-task-button"
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                marginBottom: "14px",
+              }}
+              onClick={() => navigate("/missions/new")}
+            >
+              <FiPlus />
+              Create my first mission
+            </button>
+
+            <button
+              onClick={dismissMissionPrompt}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "#777",
+                cursor: "pointer",
+                padding: "10px",
+                fontSize: "14px",
+              }}
+            >
+              I'll do this later
+            </button>
+          </div>
+        </div>
+      )}
+
       <aside className="dashboard-sidebar">
         <Link to="/" className="dashboard-logo">
           trajectory.
@@ -126,7 +327,7 @@ function Dashboard() {
 
           <button
             className="add-task-button"
-            onClick={() => navigate("/missions")}
+            onClick={() => navigate("/missions/new")}
           >
             <FiPlus />
             New mission
@@ -154,8 +355,12 @@ function Dashboard() {
           </div>
 
           <div className="momentum-circle">
-            <strong>0</strong>
-            <span>tasks complete</span>
+            <strong>{completedMissions}</strong>
+            <span>
+              {completedMissions === 1
+                ? "mission complete"
+                : "missions complete"}
+            </span>
           </div>
         </section>
 
@@ -193,6 +398,7 @@ function Dashboard() {
                   Complete your onboarding questionnaire so
                   Trajectory can personalise your experience.
                 </p>
+
                 <button
                   className="profile-action"
                   onClick={() => navigate("/questionnaire")}
@@ -235,17 +441,49 @@ function Dashboard() {
             </section>
 
             <section className="weekly-card" id="progress">
-              <span className="card-label">YOUR NEXT STEP</span>
+              <span className="card-label">YOUR PROGRESS</span>
 
-              <h3>Ready for a mission?</h3>
+              <h3>
+                {totalMissions === 0
+                  ? "Your progress starts here."
+                  : `${completedMissions} of ${totalMissions} missions completed`}
+              </h3>
 
               <p className="routine-description">
-                Turn something you've been putting off into
-                smaller, more manageable steps.
+                {completedSteps} of {totalSteps} steps completed
               </p>
 
+              {totalMissions > 0 && (
+                <div
+                  style={{
+                    height: "8px",
+                    background: "#eee",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    margin: "14px 0",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${
+                        totalSteps > 0
+                          ? (completedSteps / totalSteps) * 100
+                          : 0
+                      }%`,
+                      background: "#8b70c9",
+                      borderRadius: "20px",
+                      transition: "width 0.4s ease",
+                    }}
+                  />
+                </div>
+              )}
+
               <Link to="/missions" className="text-link">
-                View missions <FiArrowRight />
+                {totalMissions === 0
+                  ? "Create a mission"
+                  : "View your missions"}
+                <FiArrowRight />
               </Link>
             </section>
           </div>
