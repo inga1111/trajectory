@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Landing from "./pages/Landing/Landing";
@@ -7,21 +8,20 @@ import Loading from "./pages/Loading/Loading";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Missions from "./pages/Missions/Missions";
 import MissionDetail from "./pages/MissionDetail/MissionDetail";
+import AddMission from "./pages/AddMission/AddMission";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/questionnaire" element={<Questionnaire />} />
         <Route path="/loading" element={<Loading />} />
-        <Route path="/loading" element={<Loading />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/missions" element={<Missions />} /> 
+        <Route path="/missions" element={<Missions />} />
+        <Route path="/missions/new" element={<AddMission />} />
         <Route path="/missions/:id" element={<MissionDetail />} />
-
       </Routes>
     </BrowserRouter>
   );

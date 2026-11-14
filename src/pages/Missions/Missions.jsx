@@ -1,156 +1,278 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FiArrowLeft,
   FiArrowRight,
   FiCheckCircle,
   FiClock,
+  FiPlus,
   FiTarget,
-  FiZap,
 } from "react-icons/fi";
 import "./Missions.css";
 
-const missions = [
-  {
-    id: 1,
-    title: "Start that assignment",
-    description: "Turn the thing you've been putting off into a few manageable steps.",
-    category: "Study",
-    duration: "15 min",
-    difficulty: "Easy start",
-    icon: <FiTarget />,
-  },
-  {
-    id: 2,
-    title: "Reset your space",
-    description: "Make your environment feel a little calmer, one small area at a time.",
-    category: "Daily life",
-    duration: "10 min",
-    difficulty: "Quick win",
-    icon: <FiZap />,
-  },
-  {
-    id: 3,
-    title: "Get your day together",
-    description: "Choose what matters today without trying to do everything at once.",
-    category: "Planning",
-    duration: "5 min",
-    difficulty: "Gentle start",
-    icon: <FiClock />,
-  },
-  {
-    id: 4,
-    title: "Take care of yourself",
-    description: "Make space for one small thing that helps you feel looked after.",
-    category: "Wellbeing",
-    duration: "10 min",
-    difficulty: "At your pace",
-    icon: <FiCheckCircle />,
-  },
-];
+const MISSIONS_KEY = "trajectoryMissions";
+const PROGRESS_KEY = "trajectoryMissionProgress";
 
 function Missions() {
   const navigate = useNavigate();
+  const [missions, setMissions] = useState([]);
+  const [progressData, setProgressData] = useState({});
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const categories = ["All", "Study", "Daily life", "Planning", "Wellbeing"];
+  useEffect(() => {
+    const loadData = () => {
+      try {
+        setMissions(
+          JSON.parse(localStorage.getItem(MISSIONS_KEY) || "[]")
+        );
+        setProgressData(
+          JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}")
+        );
+      } catch (error) {
+        console.error("Could not load missions:", error);
+        setMissions([]);
+        setProgressData({});
+      }
+    };
+
+    loadData();
+
+    window.addEventListener("storage", loadData);
+    window.addEventListener("trajectoryMissionsUpdated", loadData);
+    window.addEventListener("trajectoryProgressUpdated", loadData);
+
+    return () => {
+      window.removeEventListener("storage", loadData);
+      window.removeEventListener("trajectoryMissionsUpdated", loadData);
+      window.removeEventListener("trajectoryProgressUpdated", loadData);
+    };
+  }, []);
+
+  const categories = [
+    "All",
+    ...new Set(missions.map((mission) => mission.category || "Other")),
+  ];
 
   const filteredMissions =
     activeFilter === "All"
       ? missions
-      : missions.filter((mission) => mission.category === activeFilter);
+      : missions.filter(
+          (mission) => (mission.category || "Other") === activeFilter
+        );
+
+  function getProgress(mission) {
+    const saved = progressData[mission.id] || {};
+    const completedSteps = saved.completedSteps || [];
+    const totalSteps = mission.steps?.length || 0;
+
+    const completedCount = completedSteps.length;
+    const percentage =
+      totalSteps > 0
+        ? Math.round((completedCount / totalSteps) * 100)
+        : 0;
+
+    const isComplete =
+      saved.completed === true ||
+      (totalSteps > 0 && completedCount >= totalSteps);
+
+    return {
+      completedCount,
+      totalSteps,
+      percentage: isComplete ? 100 : percentage,
+      isComplete,
+      hasStarted: completedCount > 0 && !isComplete,
+    };
+  }
 
   return (
     <main className="missions-page">
-      <header className="missions-header">
-        <button
-          className="missions-back-button"
-          onClick={() => navigate("/dashboard")}
-          aria-label="Back to dashboard"
-        >
-          <FiArrowLeft />
-        </button>
+      <div className="missions-container">
+        <header className="missions-header">
+          <button
+            className="missions-back-button"
+            onClick={() => navigate("/dashboard")}
+            aria-label="Back to dashboard"
+          >
+            <FiArrowLeft />
+          </button>
 
-        <div className="missions-heading">
-          <span className="missions-eyebrow">YOUR NEXT SMALL WIN</span>
-          <h1>Your missions</h1>
-          <p>You don't have to do everything. Just start with one thing.</p>
-        </div>
-      </header>
-
-      <section className="missions-summary">
-        <div>
-          <span className="missions-summary-label">Your mission board</span>
-          <h2>Progress, not perfection.</h2>
-          <p>Every small step still counts.</p>
-        </div>
-        <div className="missions-summary-icon" aria-hidden="true">
-          <FiTarget />
-        </div>
-      </section>
-
-      <section className="missions-list-section">
-        <div className="missions-section-heading">
-          <div>
-            <h2>Find your focus</h2>
-            <p>Choose something that feels doable right now.</p>
+          <div className="missions-heading">
+            <span className="missions-eyebrow">YOUR PERSONAL MISSION BOARD</span>
+            <h1>Your missions</h1>
+            <p>Big things become easier when you take them one step at a time.</p>
           </div>
-          <span className="missions-count">
-            {filteredMissions.length} missions
+        </header>
+
+        <section className="missions-summary">
+          <div>
+            <span className="missions-summary-label">YOUR PROGRESS</span>
+            <h2>Every step moves you forward.</h2>
+            <p>
+              {missions.length === 0
+                ? "Your next achievement starts with a mission."
+                : `${missions.filter((mission) => getProgress(mission).isComplete).length} of ${missions.length} missions completed`}
+            </p>
+          </div>
+          <span className="missions-summary-icon">
+            <FiTarget />
           </span>
-        </div>
+        </section>
 
-        <div className="missions-filters" aria-label="Filter missions">
-          {categories.map((category) => (
+        <section className="missions-list-section">
+          <div className="missions-section-heading">
+            <div>
+              <h2>Your mission list</h2>
+              <p>Choose what you want to focus on.</p>
+            </div>
+
             <button
-              key={category}
-              className={`missions-filter ${
-                activeFilter === category ? "active" : ""
-              }`}
-              onClick={() => setActiveFilter(category)}
-              aria-pressed={activeFilter === category}
+              className="missions-new-button"
+              onClick={() => navigate("/missions/new")}
             >
-              {category}
+              <FiPlus />
+              New mission
             </button>
-          ))}
-        </div>
+          </div>
 
-        <div className="missions-grid">
-          {filteredMissions.map((mission) => (
-            <article className="mission-card" key={mission.id}>
-              <div className="mission-card-top">
-                <span className="mission-icon">{mission.icon}</span>
-                <span className="mission-status">Ready</span>
-              </div>
+          {missions.length > 0 && (
+            <div className="missions-filters">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={`missions-filter ${
+                    activeFilter === category ? "active" : ""
+                  }`}
+                  onClick={() => setActiveFilter(category)}
+                  aria-pressed={activeFilter === category}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
 
-              <span className="mission-category">{mission.category}</span>
-              <h3>{mission.title}</h3>
-              <p className="mission-description">{mission.description}</p>
-
-              <div className="mission-meta">
-                <span>
-                  <FiClock />
-                  {mission.duration}
-                </span>
-                <span>{mission.difficulty}</span>
-              </div>
-
-              <Link
-                to={`/missions/${mission.id}`}
-                className="mission-open-button"
+          {missions.length === 0 ? (
+            <div className="missions-empty-state">
+              <span className="missions-empty-icon">
+                <FiTarget />
+              </span>
+              <h2>Your mission board is waiting.</h2>
+              <p>
+                Add something you've been meaning to get done. We'll help you
+                break it into smaller, manageable steps.
+              </p>
+              <button
+                className="missions-new-button"
+                onClick={() => navigate("/missions/new")}
               >
-                Start mission
-                <FiArrowRight />
-              </Link>
-            </article>
-          ))}
-        </div>
+                <FiPlus />
+                Create your first mission
+              </button>
+            </div>
+          ) : (
+            <div className="missions-grid">
+              {filteredMissions.map((mission) => {
+                const progress = getProgress(mission);
 
-        {filteredMissions.length === 0 && (
-          <p>No missions in this category yet.</p>
-        )}
-      </section>
+                const status = progress.isComplete
+                  ? "Completed"
+                  : progress.hasStarted
+                  ? "In progress"
+                  : "Not started";
+
+                const buttonLabel = progress.isComplete
+                  ? "Review mission"
+                  : progress.hasStarted
+                  ? "Continue mission"
+                  : "Start mission";
+
+                return (
+                  <article
+                    className={`mission-card ${
+                      progress.isComplete ? "mission-card-completed" : ""
+                    }`}
+                    key={mission.id}
+                  >
+                    <div className="mission-card-top">
+                      <span className="mission-icon">
+                        <FiTarget />
+                      </span>
+                      <span
+                        className={`mission-status ${
+                          progress.isComplete
+                            ? "status-completed"
+                            : progress.hasStarted
+                            ? "status-progress"
+                            : ""
+                        }`}
+                      >
+                        {progress.isComplete && <FiCheckCircle />}
+                        {status}
+                      </span>
+                    </div>
+
+                    <span className="mission-category">
+                      {mission.category || "Personal"}
+                    </span>
+
+                    <h3>{mission.title}</h3>
+                    <p className="mission-description">
+                      {mission.description}
+                    </p>
+
+                    <div className="mission-meta">
+                      <span>
+                        <FiClock />
+                        {progress.totalSteps} steps
+                      </span>
+                      <span>{mission.difficulty || "Your own pace"}</span>
+                    </div>
+
+                    <div className="mission-progress-section">
+                      <div className="mission-progress-labels">
+                        <span>Mission progress</span>
+                        <strong>{progress.percentage}%</strong>
+                      </div>
+
+                      <div
+                        className="mission-progress-track"
+                        role="progressbar"
+                        aria-valuenow={progress.percentage}
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        <div
+                          className="mission-progress-fill"
+                          style={{ width: `${progress.percentage}%` }}
+                        />
+                      </div>
+
+                      <span className="mission-steps-count">
+                        {progress.completedCount} of {progress.totalSteps} steps completed
+                      </span>
+                    </div>
+
+                    <Link
+                      to={`/missions/${mission.id}`}
+                      className="mission-open-button"
+                    >
+                      {buttonLabel}
+                      <FiArrowRight />
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          {missions.length > 0 && filteredMissions.length === 0 && (
+            <p className="missions-no-results">
+              No missions in this category yet.
+            </p>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
