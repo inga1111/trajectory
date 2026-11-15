@@ -1,132 +1,159 @@
+
 .loading-page {
   min-height: 100vh;
+  padding: 30px 20px;
   background: #fff8ef;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   text-align: center;
 }
 
 .loading-content {
-  width: min(650px, 85%);
+  width: min(620px, 90%);
 }
 
-/* ORBIT */
-
-.loading-orbit {
-  position: relative;
-
-  width: 100px;
-  height: 100px;
-
-  margin: 0 auto 45px;
-
-  border: 1px solid #d8d1c8;
-  border-radius: 50%;
-
-  animation: rotate 5s linear infinite;
-}
-
-.loading-orbit::before {
-  content: "";
-
-  position: absolute;
-  inset: 15px;
-
-  border: 1px solid #a7e0e2;
-  border-radius: 50%;
-}
-
-.loading-dot {
-  position: absolute;
-
-  width: 12px;
-  height: 12px;
-
-  top: -6px;
-  left: calc(50% - 6px);
-
-  background: #a7e0e2;
-  border-radius: 50%;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* TEXT */
-
-.loading-eyebrow {
-  margin: 0 0 18px;
-
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 3px;
-
-  opacity: 0.45;
-}
-
-.loading-content h1 {
+.loading-wordmark {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 1px;
   margin: 0;
-
-  font-size: clamp(48px, 7vw, 76px);
-  line-height: 0.95;
-  letter-spacing: -4px;
+  font-size: clamp(48px, 9vw, 82px);
+  line-height: 1;
+  letter-spacing: -5px;
+  font-weight: 750;
 }
 
-.loading-content h1 span {
-  color: #6d8f91;
+.loading-wordmark span {
+  display: inline-block;
+  animation: letter-float 1.8s ease-in-out infinite;
 }
 
-.loading-message {
-  max-width: 470px;
-
-  margin: 28px auto;
-
-  color: #697279;
-
-  font-size: 16px;
-  line-height: 1.6;
+.loading-wordmark span:nth-child(1) {
+  color: #e8a6b5;
+  animation-delay: 0s;
 }
 
-.loading-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-
-  margin-top: 15px;
-
-  font-size: 12px;
-  color: #7b817f;
+.loading-wordmark span:nth-child(2) {
+  color: #e9bd8e;
+  animation-delay: 0.05s;
 }
 
-.status-dot {
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-  background: #a7e0e2;
-
-  animation: pulse 1.2s ease-in-out infinite;
+.loading-wordmark span:nth-child(3) {
+  color: #d9c47d;
+  animation-delay: 0.1s;
 }
 
-@keyframes pulse {
+.loading-wordmark span:nth-child(4) {
+  color: #a9c99d;
+  animation-delay: 0.15s;
+}
+
+.loading-wordmark span:nth-child(5) {
+  color: #8fc9c7;
+  animation-delay: 0.2s;
+}
+
+.loading-wordmark span:nth-child(6) {
+  color: #91b9d8;
+  animation-delay: 0.25s;
+}
+
+.loading-wordmark span:nth-child(7) {
+  color: #a99bd0;
+  animation-delay: 0.3s;
+}
+
+.loading-wordmark span:nth-child(8) {
+  color: #c3a1d0;
+  animation-delay: 0.35s;
+}
+
+.loading-wordmark span:nth-child(9) {
+  color: #d99ebd;
+  animation-delay: 0.4s;
+}
+
+.loading-wordmark span:nth-child(10) {
+  color: #e5a6a9;
+  animation-delay: 0.45s;
+}
+
+.loading-wordmark .loading-period {
+  color: #292a32;
+  animation-delay: 0.5s;
+}
+
+@keyframes letter-float {
   0%,
   100% {
-    opacity: 0.3;
-    transform: scale(0.8);
+    transform: translateY(0);
   }
 
   50% {
-    opacity: 1;
-    transform: scale(1);
+    transform: translateY(-5px);
+  }
+}
+
+.loading-message {
+  max-width: 440px;
+  margin: 28px auto 42px;
+  color: #697279;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.loading-progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 11px;
+  color: #55535c;
+  font-size: 13px;
+}
+
+.loading-progress-heading strong {
+  color: #292a32;
+  font-variant-numeric: tabular-nums;
+}
+
+.loading-progress-track {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #e9e2da;
+}
+
+.loading-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #e8a6b5,
+    #e9bd8e,
+    #d9c47d,
+    #a9c99d,
+    #8fc9c7,
+    #91b9d8,
+    #a99bd0
+  );
+  transition: width 120ms ease-out;
+}
+
+.loading-status {
+  margin: 18px 0 0;
+  color: #85808a;
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-wordmark span {
+    animation: none;
+  }
+
+  .loading-progress-fill {
+    transition: none;
   }
 }

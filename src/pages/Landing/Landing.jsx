@@ -1,10 +1,10 @@
+
 import { Link } from "react-router-dom";
 import "./Landing.css";
 
 function Landing() {
   return (
     <main className="landing">
-
       <nav className="landing-nav">
         <div className="logo">trajectory.</div>
 
@@ -18,7 +18,6 @@ function Landing() {
       </nav>
 
       <section className="hero">
-
         <div className="hero-text">
           <p className="eyebrow">PRODUCTIVITY, BUT DIFFERENT.</p>
 
@@ -38,9 +37,9 @@ function Landing() {
               Build my trajectory →
             </Link>
 
-            <a href="#how-it-works" className="secondary-button">
-              See how it works
-            </a>
+            <Link to="/loading" className="secondary-button">
+              See my trajectory
+            </Link>
           </div>
         </div>
 
@@ -75,7 +74,6 @@ function Landing() {
             </div>
           </div>
         </div>
-
       </section>
 
       <section className="intro-section" id="about">
@@ -100,7 +98,6 @@ function Landing() {
         </div>
 
         <div className="steps">
-
           <div className="step">
             <span>01</span>
             <h3>Tell us about you</h3>
@@ -127,10 +124,8 @@ function Landing() {
               moving forward.
             </p>
           </div>
-
         </div>
       </section>
-
     </main>
   );
 }

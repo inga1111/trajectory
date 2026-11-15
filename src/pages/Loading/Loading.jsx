@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Loading.css";
 
@@ -63,57 +63,103 @@ function createProductivityProfile(onboardingData) {
 
 function Loading() {
   const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const onboardingData = JSON.parse(
       localStorage.getItem("trajectoryOnboarding") || "null"
     );
 
-    if (!onboardingData?.completed) {
+    const existingProfile = JSON.parse(
+      localStorage.getItem("trajectoryProfile") || "null"
+    );
+
+    if (!onboardingData?.completed && !existingProfile) {
       navigate("/questionnaire", { replace: true });
       return;
     }
 
-    const profile = createProductivityProfile(onboardingData);
+    if (onboardingData?.completed) {
+      const profile = createProductivityProfile(onboardingData);
 
-    localStorage.setItem(
-      "trajectoryProfile",
-      JSON.stringify(profile)
-    );
+      localStorage.setItem(
+        "trajectoryProfile",
+        JSON.stringify(profile)
+      );
+    }
 
-    const timer = setTimeout(() => {
-      navigate("/dashboard");
-    }, 2500);
+    let current = 0;
 
-    return () => clearTimeout(timer);
+    const timer = setInterval(() => {
+      current = Math.min(
+        current + Math.floor(Math.random() * 5) + 2,
+        100
+      );
+
+      setProgress(current);
+
+      if (current >= 100) {
+        clearInterval(timer);
+
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 350);
+      }
+    }, 65);
+
+    return () => clearInterval(timer);
   }, [navigate]);
 
   return (
     <main className="loading-page">
       <div className="loading-content">
-        <div className="loading-orbit">
-          <div className="loading-dot"></div>
-        </div>
-
-        <p className="loading-eyebrow">
-          TRAJECTORY
-        </p>
-
-        <h1>
-          Building your
-          <span> trajectory.</span>
+        <h1 className="loading-wordmark" aria-label="trajectory.">
+          <span>t</span>
+          <span>r</span>
+          <span>a</span>
+          <span>j</span>
+          <span>e</span>
+          <span>c</span>
+          <span>t</span>
+          <span>o</span>
+          <span>r</span>
+          <span>y</span>
+          <span className="loading-period">.</span>
         </h1>
 
         <p className="loading-message">
-          We're learning how you work best and
-          creating a productivity experience
+          Putting the pieces together and creating a space
           that works with your brain, not against it.
         </p>
 
-        <div className="loading-status">
-          <span className="status-dot"></span>
-          Creating your productivity profile...
+        <div className="loading-progress-heading">
+          <span>Building your trajectory</span>
+          <strong>{progress}%</strong>
         </div>
+
+        <div
+          className="loading-progress-track"
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Building your trajectory"
+        >
+          <div
+            className="loading-progress-fill"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <p className="loading-status">
+          {progress < 35
+            ? "Getting to know how you work..."
+            : progress < 70
+            ? "Personalising your experience..."
+            : progress < 100
+            ? "Getting everything ready..."
+            : "You're all set."}
+        </p>
       </div>
     </main>
   );

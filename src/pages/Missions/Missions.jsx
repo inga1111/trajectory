@@ -8,6 +8,7 @@ import {
   FiClock,
   FiPlus,
   FiTarget,
+  FiTrash2,
 } from "react-icons/fi";
 import "./Missions.css";
 
@@ -26,6 +27,7 @@ function Missions() {
         setMissions(
           JSON.parse(localStorage.getItem(MISSIONS_KEY) || "[]")
         );
+
         setProgressData(
           JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}")
         );
@@ -65,8 +67,8 @@ function Missions() {
     const saved = progressData[mission.id] || {};
     const completedSteps = saved.completedSteps || [];
     const totalSteps = mission.steps?.length || 0;
-
     const completedCount = completedSteps.length;
+
     const percentage =
       totalSteps > 0
         ? Math.round((completedCount / totalSteps) * 100)
@@ -85,6 +87,44 @@ function Missions() {
     };
   }
 
+  const sortedMissions = [...filteredMissions].sort((a, b) => {
+    return (
+      Number(getProgress(a).isComplete) -
+      Number(getProgress(b).isComplete)
+    );
+  });
+
+  function deleteMission(mission) {
+    const confirmed = window.confirm(
+      `Delete "${mission.title}"? This will remove the mission and its saved step progress.`
+    );
+
+    if (!confirmed) return;
+
+    const updatedMissions = missions.filter(
+      (item) => item.id !== mission.id
+    );
+
+    const updatedProgress = { ...progressData };
+    delete updatedProgress[mission.id];
+
+    localStorage.setItem(
+      MISSIONS_KEY,
+      JSON.stringify(updatedMissions)
+    );
+
+    localStorage.setItem(
+      PROGRESS_KEY,
+      JSON.stringify(updatedProgress)
+    );
+
+    setMissions(updatedMissions);
+    setProgressData(updatedProgress);
+
+    window.dispatchEvent(new Event("trajectoryMissionsUpdated"));
+    window.dispatchEvent(new Event("trajectoryProgressUpdated"));
+  }
+
   return (
     <main className="missions-page">
       <div className="missions-container">
@@ -98,22 +138,33 @@ function Missions() {
           </button>
 
           <div className="missions-heading">
-            <span className="missions-eyebrow">YOUR PERSONAL MISSION BOARD</span>
+            <span className="missions-eyebrow">
+              YOUR PERSONAL MISSION BOARD
+            </span>
+
             <h1>Your missions</h1>
-            <p>Big things become easier when you take them one step at a time.</p>
+
+            <p>
+              Big things become easier when you take them one step at a time.
+            </p>
           </div>
         </header>
 
         <section className="missions-summary">
           <div>
-            <span className="missions-summary-label">YOUR PROGRESS</span>
+            <span className="missions-summary-label">
+              YOUR PROGRESS
+            </span>
+
             <h2>Every step moves you forward.</h2>
+
             <p>
               {missions.length === 0
                 ? "Your next achievement starts with a mission."
                 : `${missions.filter((mission) => getProgress(mission).isComplete).length} of ${missions.length} missions completed`}
             </p>
           </div>
+
           <span className="missions-summary-icon">
             <FiTarget />
           </span>
@@ -157,11 +208,14 @@ function Missions() {
               <span className="missions-empty-icon">
                 <FiTarget />
               </span>
+
               <h2>Your mission board is waiting.</h2>
+
               <p>
                 Add something you've been meaning to get done. We'll help you
                 break it into smaller, manageable steps.
               </p>
+
               <button
                 className="missions-new-button"
                 onClick={() => navigate("/missions/new")}
@@ -172,7 +226,7 @@ function Missions() {
             </div>
           ) : (
             <div className="missions-grid">
-              {filteredMissions.map((mission) => {
+              {sortedMissions.map((mission) => {
                 const progress = getProgress(mission);
 
                 const status = progress.isComplete
@@ -190,7 +244,9 @@ function Missions() {
                 return (
                   <article
                     className={`mission-card ${
-                      progress.isComplete ? "mission-card-completed" : ""
+                      progress.isComplete
+                        ? "mission-card-completed"
+                        : ""
                     }`}
                     key={mission.id}
                   >
@@ -198,6 +254,7 @@ function Missions() {
                       <span className="mission-icon">
                         <FiTarget />
                       </span>
+
                       <span
                         className={`mission-status ${
                           progress.isComplete
@@ -210,6 +267,16 @@ function Missions() {
                         {progress.isComplete && <FiCheckCircle />}
                         {status}
                       </span>
+
+                      <button
+                        type="button"
+                        className="mission-delete-button"
+                        onClick={() => deleteMission(mission)}
+                        aria-label={`Delete ${mission.title}`}
+                        title="Delete mission"
+                      >
+                        <FiTrash2 />
+                      </button>
                     </div>
 
                     <span className="mission-category">
@@ -217,6 +284,7 @@ function Missions() {
                     </span>
 
                     <h3>{mission.title}</h3>
+
                     <p className="mission-description">
                       {mission.description}
                     </p>
@@ -226,7 +294,10 @@ function Missions() {
                         <FiClock />
                         {progress.totalSteps} steps
                       </span>
-                      <span>{mission.difficulty || "Your own pace"}</span>
+
+                      <span>
+                        {mission.difficulty || "Your own pace"}
+                      </span>
                     </div>
 
                     <div className="mission-progress-section">
@@ -244,7 +315,9 @@ function Missions() {
                       >
                         <div
                           className="mission-progress-fill"
-                          style={{ width: `${progress.percentage}%` }}
+                          style={{
+                            width: `${progress.percentage}%`,
+                          }}
                         />
                       </div>
 
