@@ -13,8 +13,13 @@ import {
   FiZap,
   FiX,
   FiAward,
+  FiStar,
 } from "react-icons/fi";
 import "./Dashboard.css";
+
+const LEVEL_THRESHOLDS = [
+  0, 100, 250, 450, 700, 1000, 1400, 1850, 2350, 3000,
+];
 
 function readStorage(key, fallback) {
   try {
@@ -22,6 +27,42 @@ function readStorage(key, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function getLevelInfo(totalXP) {
+  let levelIndex = 0;
+
+  for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+    if (totalXP >= LEVEL_THRESHOLDS[i]) {
+      levelIndex = i;
+    }
+  }
+
+  const currentLevelXP = LEVEL_THRESHOLDS[levelIndex];
+  const nextLevelXP = LEVEL_THRESHOLDS[levelIndex + 1];
+
+  if (nextLevelXP === undefined) {
+    return {
+      level: levelIndex + 1,
+      currentLevelXP,
+      nextLevelXP: null,
+      progress: 100,
+      remainingXP: 0,
+    };
+  }
+
+  const progress =
+    ((totalXP - currentLevelXP) /
+      (nextLevelXP - currentLevelXP)) *
+    100;
+
+  return {
+    level: levelIndex + 1,
+    currentLevelXP,
+    nextLevelXP,
+    progress: Math.min(100, Math.max(0, progress)),
+    remainingXP: nextLevelXP - totalXP,
+  };
 }
 
 function Dashboard() {
@@ -37,6 +78,13 @@ function Dashboard() {
 
   const [progress, setProgress] = useState(() =>
     readStorage("trajectoryMissionProgress", {})
+  );
+
+  const [rewards, setRewards] = useState(() =>
+    readStorage("trajectoryRewards", {
+      totalXP: 0,
+      unlockedAchievements: [],
+    })
   );
 
   const [showMissionPrompt, setShowMissionPrompt] = useState(() => {
@@ -62,9 +110,14 @@ function Dashboard() {
         "trajectoryMissionProgress",
         {}
       );
+      const updatedRewards = readStorage("trajectoryRewards", {
+        totalXP: 0,
+        unlockedAchievements: [],
+      });
 
       setMissions(updatedMissions);
       setProgress(updatedProgress);
+      setRewards(updatedRewards);
 
       if (updatedMissions.length > 0) {
         setShowMissionPrompt(false);
@@ -81,6 +134,11 @@ function Dashboard() {
       refreshDashboard
     );
 
+    window.addEventListener(
+      "trajectoryRewardsUpdated",
+      refreshDashboard
+    );
+
     window.addEventListener("storage", refreshDashboard);
 
     return () => {
@@ -91,6 +149,11 @@ function Dashboard() {
 
       window.removeEventListener(
         "trajectoryProgressUpdated",
+        refreshDashboard
+      );
+
+      window.removeEventListener(
+        "trajectoryRewardsUpdated",
         refreshDashboard
       );
 
@@ -121,6 +184,12 @@ function Dashboard() {
     const missionProgress = progress[mission.id];
     return total + (missionProgress?.completedSteps?.length || 0);
   }, 0);
+
+  const totalXP = rewards.totalXP || 0;
+  const levelInfo = getLevelInfo(totalXP);
+
+  const achievementCount =
+    rewards.unlockedAchievements?.length || 0;
 
   const today = new Date();
 
@@ -474,6 +543,128 @@ function Dashboard() {
                 {totalMissions === 0
                   ? "Create a mission"
                   : "View your missions"}
+                <FiArrowRight />
+              </Link>
+            </section>
+
+            <section
+              className="weekly-card"
+              style={{
+                background: "linear-gradient(135deg, #f4efff, #faf7ff)",
+                border: "1px solid #e8ddff",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "16px",
+                }}
+              >
+                <span className="card-label">YOUR REWARDS</span>
+                <FiAward size={22} color="#8b70c9" />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginBottom: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "15px",
+                    background: "#e7dcff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#7957bd",
+                    fontSize: "23px",
+                    flexShrink: 0,
+                  }}
+                >
+                  <FiStar />
+                </div>
+
+                <div>
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: "12px",
+                      color: "#777",
+                      marginBottom: "3px",
+                    }}
+                  >
+                    CURRENT LEVEL
+                  </span>
+
+                  <strong style={{ fontSize: "21px", color: "#49356f" }}>
+                    Level {levelInfo.level}
+                  </strong>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "8px",
+                }}
+              >
+                <strong style={{ fontSize: "18px", color: "#49356f" }}>
+                  {totalXP.toLocaleString()} XP
+                </strong>
+
+                <span style={{ fontSize: "12px", color: "#777" }}>
+                  {levelInfo.nextLevelXP !== null
+                    ? `${levelInfo.remainingXP} XP to next level`
+                    : "Maximum level reached!"}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  height: "9px",
+                  background: "#e6def2",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  marginBottom: "14px",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${levelInfo.progress}%`,
+                    background: "linear-gradient(90deg, #9272d1, #b59be8)",
+                    borderRadius: "20px",
+                    transition: "width 0.5s ease",
+                  }}
+                />
+              </div>
+
+              <p
+                style={{
+                  fontSize: "13px",
+                  color: "#777",
+                  marginBottom: "18px",
+                }}
+              >
+                {achievementCount} achievement
+                {achievementCount === 1 ? "" : "s"} unlocked
+              </p>
+
+              <Link
+                to="/rewards"
+                className="text-link"
+                style={{ color: "#7957bd" }}
+              >
+                View your rewards
                 <FiArrowRight />
               </Link>
             </section>
