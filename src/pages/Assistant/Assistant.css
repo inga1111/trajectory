@@ -1,0 +1,57 @@
+
+.assistant-page{min-height:100vh;background:#fff8ef;color:#30323a}
+.assistant-header{height:76px;padding:0 6%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9e1d8;background:#fffdfa}
+.assistant-back,.assistant-logo{display:flex;align-items:center;gap:8px;color:#687572;text-decoration:none;font-size:13px;font-weight:600}
+.assistant-logo{font-size:23px;letter-spacing:-1px;background:linear-gradient(90deg,#e8a6b5,#e9bd8e,#d9c47d,#a9c99d,#8fc9c7,#91b9d8,#a99bd0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.assistant-layout{width:min(1250px,92%);min-height:calc(100vh - 76px);margin:0 auto;padding:48px 0;display:grid;grid-template-columns:.85fr 1.15fr;gap:55px;align-items:stretch}
+.assistant-intro{padding:24px 0;display:flex;flex-direction:column;align-items:flex-start}
+.assistant-orbit{width:70px;height:70px;margin-bottom:30px;display:grid;place-items:center;border:1px solid #d9c9d9;border-radius:50%;position:relative;color:#fff;font-size:32px}
+.assistant-orbit:before,.assistant-orbit:after{content:"";position:absolute;border:1px solid #e8c8c5;border-radius:50%;inset:-8px 5px;transform:rotate(45deg)}
+.assistant-orbit:after{inset:5px -8px;transform:rotate(-45deg)}
+.assistant-eyebrow{color:#7d9f9c;font-size:10px;font-weight:800;letter-spacing:1.6px;line-height:1.6}
+.assistant-intro h1{max-width:440px;margin:15px 0;font-size:clamp(42px,5vw,65px);line-height:1.02;letter-spacing:-3px}
+.assistant-intro h1 span{background:linear-gradient(90deg,#e8a6b5,#e9bd8e,#d9c47d,#a9c99d,#8fc9c7,#91b9d8,#a99bd0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.assistant-intro>p{max-width:430px;color:#777b80;font-size:14px;line-height:1.8}
+.assistant-suggestions{width:100%;margin-top:35px}
+.assistant-suggestions-label{display:block;margin-bottom:13px;color:#96918e;font-size:10px;font-weight:800;letter-spacing:1.4px}
+.assistant-suggestions button{width:100%;display:flex;align-items:center;gap:12px;padding:14px 15px;margin-bottom:9px;border:1px solid #eee5dc;border-radius:13px;background:#fffdfa;color:#5d6968;text-align:left;font:inherit;font-size:12px;cursor:pointer;transition:transform .18s,border-color .18s}
+.assistant-suggestions button:hover{transform:translateX(3px);border-color:#a7d9d5}
+.assistant-suggestions button svg{color:#7ea9a5;font-size:16px}
+.assistant-profile-note{display:flex;align-items:flex-start;gap:12px;margin-top:auto;padding:17px;border-radius:15px;background:#eaf5f2;color:#71908b}
+.assistant-profile-note svg{flex-shrink:0;margin-top:2px}
+.assistant-profile-note p{margin:0;color:#6d7e7b;font-size:11px;line-height:1.6}
+.assistant-chat{min-height:650px;max-height:calc(100vh - 125px);display:flex;flex-direction:column;overflow:hidden;border:1px solid #e9e2da;border-radius:24px;background:#fff;box-shadow:0 12px 40px rgba(52,43,58,.05)}
+.assistant-chat-heading{display:flex;align-items:center;gap:12px;padding:20px 23px;border-bottom:1px solid #eee9e3}
+.assistant-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#f5d6a8,#e8b9cb,#b7ded8);color:#fff;font-size:24px}
+.assistant-chat-heading strong,.assistant-chat-heading span{display:block}
+.assistant-chat-heading strong{font-size:13px}
+.assistant-chat-heading div:nth-child(2) span{margin-top:4px;color:#96918e;font-size:10px}
+.assistant-online-dot{width:8px;height:8px;margin-left:auto;border-radius:50%;background:#8bc5a5;box-shadow:0 0 0 4px #eaf6ef}
+.assistant-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:17px}
+.assistant-message{max-width:88%;display:flex;align-items:flex-start;gap:9px}
+.assistant-message p{margin:0;padding:13px 15px;border-radius:5px 16px 16px 16px;background:#f5f2ee;color:#535b5d;font-size:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.assistant-message.user{align-self:flex-end}
+.assistant-message.user p{border-radius:16px 5px 16px 16px;background:#e6f3f0;color:#435d59}
+.assistant-message-star{width:25px;height:25px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:#f3e8f2;color:#a98fb4;font-size:13px}
+.assistant-thinking{color:#89878b!important;font-style:italic}
+.assistant-mission-draft{margin:3px 0 8px 34px;padding:19px;border:1px solid #dce9e8;border-radius:17px;background:#f6fbfa}
+.draft-heading{display:flex;align-items:center;gap:8px;color:#719994;font-size:10px;font-weight:800;letter-spacing:1.1px}
+.assistant-mission-draft h3{margin:13px 0 5px;font-size:19px}
+.assistant-mission-draft>p{margin:0;color:#79817f;font-size:12px;line-height:1.6}
+.draft-steps{margin:15px 0;display:flex;flex-direction:column;gap:10px}
+.draft-step{display:flex;gap:12px;padding:10px 0;border-top:1px solid #e4eeeb}
+.draft-step>span{color:#8caeaa;font-size:11px;font-weight:800}
+.draft-step strong,.draft-step small{display:block}
+.draft-step strong{font-size:12px}
+.draft-step small{margin-top:4px;color:#858e8b;font-size:10px;line-height:1.5}
+.assistant-save-mission{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:0;border-radius:11px;background:#a7d9d5;color:#24413f;font-size:12px;font-weight:700;cursor:pointer}
+.assistant-saved-notice{display:flex;align-items:center;gap:8px;color:#638e79;font-size:12px}
+.assistant-error{margin:0 22px 10px;color:#b45b63;font-size:11px}
+.assistant-composer{display:flex;align-items:flex-end;gap:12px;margin:0 18px;padding:12px;border:1px solid #e9e2da;border-radius:15px;background:#fffdfa}
+.assistant-composer textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:#30323a;font:inherit;font-size:13px;line-height:1.6}
+.assistant-composer textarea::placeholder{color:#aaa5a1}
+.assistant-composer button{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;border:0;border-radius:12px;background:#a7d9d5;color:#24413f;font-size:17px;cursor:pointer}
+.assistant-composer button:disabled{opacity:.45;cursor:not-allowed}
+.assistant-disclaimer{margin:10px 20px 15px;color:#aaa5a1;text-align:center;font-size:9px}
+@media(max-width:850px){.assistant-layout{grid-template-columns:1fr;gap:25px;padding:28px 0}.assistant-intro{padding:10px 0}.assistant-orbit{margin-bottom:20px}.assistant-suggestions{margin-top:20px}.assistant-profile-note{margin-top:15px}.assistant-chat{min-height:600px;max-height:75vh}}
+@media(max-width:520px){.assistant-header{padding:0 5%}.assistant-layout{width:90%}.assistant-intro h1{font-size:44px}.assistant-chat{min-height:570px;border-radius:18px}.assistant-messages{padding:17px}.assistant-chat-heading{padding:16px}.assistant-mission-draft{margin-left:0}.assistant-message{max-width:95%}}

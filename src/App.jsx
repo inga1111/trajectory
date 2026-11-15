@@ -20,24 +20,24 @@ import Rewards from "./pages/Rewards/Rewards";
 import Timer from "./pages/Timer/Timer";
 import Calendar from "./pages/Calendar/Calendar";
 import Profile from "./pages/Profile/Profile";
+import Assistant from "./pages/Assistant/Assistant";
 
 function TimerNavigationGuard() {
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = (() => {
-      try {
-        return JSON.parse(localStorage.getItem("trajectoryFocusTimer") || "null");
-      } catch {
-        return null;
-      }
-    })();
+    let timer = null;
 
-    const timerIsActive =
-      saved?.status === "active" && saved.endsAt > Date.now();
+    try {
+      timer = JSON.parse(localStorage.getItem("trajectoryFocusTimer") || "null");
+    } catch {
+      timer = null;
+    }
 
-    if (timerIsActive && location.pathname !== "/timer") {
+    const active = timer?.status === "active" && Number(timer.endsAt) > Date.now();
+
+    if (active && location.pathname !== "/timer") {
       navigate("/timer", { replace: true });
     }
   }, [location.pathname, navigate]);
@@ -62,6 +62,7 @@ function AppRoutes() {
         <Route path="/timer" element={<Timer />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/assistant" element={<Assistant />} />
       </Routes>
     </>
   );

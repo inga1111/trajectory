@@ -152,6 +152,10 @@ function Dashboard() {
           <Link to="/profile" className="profile-mini">
             <div className="profile-avatar">{displayName.charAt(0).toUpperCase()}</div>
             <div><strong>{displayName}</strong><span>Your trajectory</span></div>
+            <Link to="/assistant" className="nav-item">
+            <FiZap />
+            <span>AI companion</span>
+            </Link>
           </Link>
         </div>
       </aside>
