@@ -27,7 +27,6 @@ function Missions() {
         setMissions(
           JSON.parse(localStorage.getItem(MISSIONS_KEY) || "[]")
         );
-
         setProgressData(
           JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}")
         );
@@ -56,19 +55,12 @@ function Missions() {
     ...new Set(missions.map((mission) => mission.category || "Other")),
   ];
 
-  const filteredMissions =
-    activeFilter === "All"
-      ? missions
-      : missions.filter(
-          (mission) => (mission.category || "Other") === activeFilter
-        );
-
   function getProgress(mission) {
     const saved = progressData[mission.id] || {};
     const completedSteps = saved.completedSteps || [];
     const totalSteps = mission.steps?.length || 0;
-    const completedCount = completedSteps.length;
 
+    const completedCount = completedSteps.length;
     const percentage =
       totalSteps > 0
         ? Math.round((completedCount / totalSteps) * 100)
@@ -87,16 +79,9 @@ function Missions() {
     };
   }
 
-  const sortedMissions = [...filteredMissions].sort((a, b) => {
-    return (
-      Number(getProgress(a).isComplete) -
-      Number(getProgress(b).isComplete)
-    );
-  });
-
   function deleteMission(mission) {
     const confirmed = window.confirm(
-      `Delete "${mission.title}"? This will remove the mission and its saved step progress.`
+      `Are you sure you want to delete "${mission.title}"? This will remove its saved progress too.`
     );
 
     if (!confirmed) return;
@@ -108,15 +93,8 @@ function Missions() {
     const updatedProgress = { ...progressData };
     delete updatedProgress[mission.id];
 
-    localStorage.setItem(
-      MISSIONS_KEY,
-      JSON.stringify(updatedMissions)
-    );
-
-    localStorage.setItem(
-      PROGRESS_KEY,
-      JSON.stringify(updatedProgress)
-    );
+    localStorage.setItem(MISSIONS_KEY, JSON.stringify(updatedMissions));
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(updatedProgress));
 
     setMissions(updatedMissions);
     setProgressData(updatedProgress);
@@ -124,6 +102,24 @@ function Missions() {
     window.dispatchEvent(new Event("trajectoryMissionsUpdated"));
     window.dispatchEvent(new Event("trajectoryProgressUpdated"));
   }
+
+  const filteredMissions =
+    activeFilter === "All"
+      ? missions
+      : missions.filter(
+          (mission) => (mission.category || "Other") === activeFilter
+        );
+
+  const sortedMissions = [...filteredMissions].sort((a, b) => {
+    const aComplete = getProgress(a).isComplete;
+    const bComplete = getProgress(b).isComplete;
+
+    return Number(aComplete) - Number(bComplete);
+  });
+
+  const completedCount = missions.filter(
+    (mission) => getProgress(mission).isComplete
+  ).length;
 
   return (
     <main className="missions-page">
@@ -141,9 +137,7 @@ function Missions() {
             <span className="missions-eyebrow">
               YOUR PERSONAL MISSION BOARD
             </span>
-
             <h1>Your missions</h1>
-
             <p>
               Big things become easier when you take them one step at a time.
             </p>
@@ -152,16 +146,12 @@ function Missions() {
 
         <section className="missions-summary">
           <div>
-            <span className="missions-summary-label">
-              YOUR PROGRESS
-            </span>
-
+            <span className="missions-summary-label">YOUR PROGRESS</span>
             <h2>Every step moves you forward.</h2>
-
             <p>
               {missions.length === 0
                 ? "Your next achievement starts with a mission."
-                : `${missions.filter((mission) => getProgress(mission).isComplete).length} of ${missions.length} missions completed`}
+                : `${completedCount} of ${missions.length} missions completed`}
             </p>
           </div>
 
@@ -208,14 +198,11 @@ function Missions() {
               <span className="missions-empty-icon">
                 <FiTarget />
               </span>
-
               <h2>Your mission board is waiting.</h2>
-
               <p>
                 Add something you've been meaning to get done. We'll help you
                 break it into smaller, manageable steps.
               </p>
-
               <button
                 className="missions-new-button"
                 onClick={() => navigate("/missions/new")}
@@ -246,7 +233,7 @@ function Missions() {
                     className={`mission-card ${
                       progress.isComplete
                         ? "mission-card-completed"
-                        : ""
+                        : "mission-card-active"
                     }`}
                     key={mission.id}
                   >
@@ -269,7 +256,6 @@ function Missions() {
                       </span>
 
                       <button
-                        type="button"
                         className="mission-delete-button"
                         onClick={() => deleteMission(mission)}
                         aria-label={`Delete ${mission.title}`}
@@ -294,10 +280,7 @@ function Missions() {
                         <FiClock />
                         {progress.totalSteps} steps
                       </span>
-
-                      <span>
-                        {mission.difficulty || "Your own pace"}
-                      </span>
+                      <span>{mission.difficulty || "Your own pace"}</span>
                     </div>
 
                     <div className="mission-progress-section">
@@ -315,9 +298,7 @@ function Missions() {
                       >
                         <div
                           className="mission-progress-fill"
-                          style={{
-                            width: `${progress.percentage}%`,
-                          }}
+                          style={{ width: `${progress.percentage}%` }}
                         />
                       </div>
 
@@ -333,6 +314,26 @@ function Missions() {
                       {buttonLabel}
                       <FiArrowRight />
                     </Link>
+
+                    <div
+                      className={`mission-visual-overlay ${
+                        progress.isComplete
+                          ? "completed-overlay"
+                          : "active-overlay"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {progress.isComplete ? (
+                        <span className="overlay-message">
+                          <FiCheckCircle />
+                          Mission Complete
+                        </span>
+                      ) : (
+                        <span className="overlay-message">
+                          {progress.percentage}% complete
+                        </span>
+                      )}
+                    </div>
                   </article>
                 );
               })}
