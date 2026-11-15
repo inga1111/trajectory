@@ -4,6 +4,28 @@
   background: #fff8ef;
 }
 
+/* RAINBOW BRANDING */
+
+.rainbow-text,
+.hero-heading-rainbow {
+  background: linear-gradient(
+    90deg,
+    #e8a6b5 0%,
+    #e9bd8e 10%,
+    #d9c47d 20%,
+    #a9c99d 30%,
+    #8fc9c7 40%,
+    #91b9d8 55%,
+    #a99bd0 70%,
+    #c3a1d0 85%,
+    #d99ebd 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 /* NAVIGATION */
 
 .landing-nav {
@@ -15,9 +37,9 @@
 }
 
 .logo {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -1px;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
 }
 
 .nav-links {
@@ -67,10 +89,18 @@
   line-height: 0.98;
   letter-spacing: -4px;
   font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.hero h1 span {
+.hero-heading-main {
   color: #6d8f91;
+}
+
+.hero-heading-rainbow {
+  display: inline-block;
+  padding-bottom: 5px;
 }
 
 .hero-description {
@@ -289,5 +319,20 @@
   .intro-section,
   .how-section {
     padding: 90px 7%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-buttons {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hero-heading-rainbow {
+    font-size: 0.95em;
+  }
+
+  .logo {
+    font-size: 27px;
   }
 }

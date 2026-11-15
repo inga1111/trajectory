@@ -88,24 +88,29 @@ function Loading() {
       );
     }
 
-    let current = 0;
+    const duration = 6000;
+    const interval = 60;
+    const totalSteps = duration / interval;
+    let currentStep = 0;
 
     const timer = setInterval(() => {
-      current = Math.min(
-        current + Math.floor(Math.random() * 5) + 2,
+      currentStep += 1;
+
+      const nextProgress = Math.min(
+        Math.round((currentStep / totalSteps) * 100),
         100
       );
 
-      setProgress(current);
+      setProgress(nextProgress);
 
-      if (current >= 100) {
+      if (nextProgress >= 100) {
         clearInterval(timer);
 
         setTimeout(() => {
           navigate("/dashboard", { replace: true });
-        }, 350);
+        }, 500);
       }
-    }, 65);
+    }, interval);
 
     return () => clearInterval(timer);
   }, [navigate]);
@@ -152,10 +157,12 @@ function Loading() {
         </div>
 
         <p className="loading-status">
-          {progress < 35
+          {progress < 25
             ? "Getting to know how you work..."
-            : progress < 70
+            : progress < 55
             ? "Personalising your experience..."
+            : progress < 85
+            ? "Putting your productivity profile together..."
             : progress < 100
             ? "Getting everything ready..."
             : "You're all set."}

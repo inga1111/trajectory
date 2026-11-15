@@ -3,10 +3,14 @@ import { Link } from "react-router-dom";
 import "./Landing.css";
 
 function Landing() {
+  const hasExistingTrajectory =
+    localStorage.getItem("trajectoryProfile") ||
+    localStorage.getItem("trajectoryOnboarding");
+
   return (
     <main className="landing">
       <nav className="landing-nav">
-        <div className="logo">trajectory.</div>
+        <div className="logo rainbow-text">trajectory.</div>
 
         <div className="nav-links">
           <a href="#about">About</a>
@@ -22,8 +26,12 @@ function Landing() {
           <p className="eyebrow">PRODUCTIVITY, BUT DIFFERENT.</p>
 
           <h1>
-            Helping neurodivergents
-            <span> get shit done.</span>
+            <span className="hero-heading-main">
+              Helping neurodivergents
+            </span>
+            <span className="hero-heading-rainbow">
+              get shit done.
+            </span>
           </h1>
 
           <p className="hero-description">
@@ -37,7 +45,14 @@ function Landing() {
               Build my trajectory →
             </Link>
 
-            <Link to="/loading" className="secondary-button">
+            <Link
+              to={
+                hasExistingTrajectory
+                  ? "/loading"
+                  : "/questionnaire"
+              }
+              className="secondary-button"
+            >
               See my trajectory
             </Link>
           </div>
