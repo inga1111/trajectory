@@ -176,7 +176,7 @@ function Dashboard() {
           <div className="momentum-copy">
             <span className="card-label">YOUR TRAJECTORY</span>
             <h2>Progress at <span>your pace.</span></h2>
-            <p>You don't need to do everything at once. Your journey starts with one manageable step.</p>
+            <p>You don't need to do everything at once.</p>
             <Link to="/missions" className="text-link">Explore your missions <FiArrowRight /></Link>
           </div>
           <div className="momentum-circle">

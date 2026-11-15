@@ -23,21 +23,24 @@ function Landing() {
 
       <section className="hero">
         <div className="hero-text">
-          <p className="eyebrow">PRODUCTIVITY, BUT DIFFERENT.</p>
+          <p className="eyebrow">TIRED OF NOT GETTING THINGS DONE? WELL,TRAJECTORY IS...</p>
 
           <h1>
             <span className="hero-heading-main">
               Helping neurodivergents
             </span>
-            <span className="hero-heading-rainbow">
-              get shit done.
+            </h1>
+
+            <h1>
+              <span className="hero-heading-rainbow">
+              GET SHIT DONE.
             </span>
           </h1>
 
           <p className="hero-description">
-            Trajectory helps you turn overwhelming tasks into
-            manageable steps, build momentum, and actually get
-            where you're trying to go.
+            Trajectory isn't just another task manager or planner.
+            It's a PERSONALISED
+            system built for your personal needs and habits.
           </p>
 
           <div className="hero-buttons">
@@ -69,8 +72,8 @@ function Landing() {
             </div>
 
             <div className="progress-circle">
-              <strong>72%</strong>
-              <small>momentum</small>
+              <strong>2/8</strong>
+              <small>tasks completed</small>
             </div>
 
             <div className="mini-task">
@@ -85,7 +88,7 @@ function Landing() {
 
             <div className="mini-task unfinished">
               <span className="empty-check"></span>
-              Take a break
+              Do laundry
             </div>
           </div>
         </div>
@@ -97,7 +100,7 @@ function Landing() {
         <h2>
           You don't need more discipline.
           <br />
-          You need a system that works with you.
+          You need a system that works for you.
         </h2>
 
         <p>
