@@ -1,0 +1,23 @@
+
+.profile-page{min-height:100vh;background:#fff8ef;color:#293337}
+.profile-page-header{height:78px;padding:0 6%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9e1d8}
+.profile-back,.profile-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:#596663;font-size:13px;font-weight:600}
+.profile-logo{font-size:23px;letter-spacing:-1px;background:linear-gradient(90deg,#e8a6b5,#e9bd8e,#d9c47d,#a9c99d,#8fc9c7,#91b9d8,#a99bd0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.profile-page-content{width:min(700px,calc(100% - 35px));margin:55px auto 80px}
+.profile-eyebrow{font-size:10px;font-weight:700;letter-spacing:2px;color:#8caaa7}
+.profile-page-content h1{margin:10px 0;font-size:clamp(38px,6vw,54px);letter-spacing:-3px}
+.profile-intro{max-width:550px;margin:0 0 30px;color:#78817f;font-size:14px;line-height:1.7}
+.profile-form{padding:30px;border:1px solid #eee6dc;border-radius:22px;background:#fffdfa}
+.profile-section-heading{display:flex;align-items:center;gap:13px;margin-bottom:22px;color:#709a95}
+.profile-section-heading>svg{font-size:22px}
+.profile-section-heading h2{margin:0;color:#293337;font-size:19px}
+.profile-section-heading p{margin:4px 0 0;color:#89918d;font-size:11px}
+.profile-form>label,.profile-field label{display:block;margin:0 0 8px;color:#697572;font-size:11px;font-weight:600}
+.profile-form input{width:100%;padding:13px 14px;border:1px solid #e8e1d8;border-radius:11px;background:#fff;color:#293337;font:inherit;font-size:13px;outline-color:#a7d9d5}
+.profile-preferences-heading{margin-top:35px;padding-top:27px;border-top:1px solid #eee9e3}
+.profile-field{margin-bottom:17px}
+.profile-save-row{display:flex;align-items:center;gap:15px;margin-top:25px}
+.profile-save-button{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border:0;border-radius:25px;background:#a7d9d5;color:#293f3d;font-size:12px;font-weight:700;cursor:pointer}
+.profile-saved-message{color:#69977e;font-size:12px}
+.profile-questionnaire-link{display:block;margin:20px auto;border:0;background:transparent;color:#6d9692;font-size:12px;cursor:pointer}
+@media(max-width:550px){.profile-form{padding:22px}.profile-page-content{margin-top:35px}}

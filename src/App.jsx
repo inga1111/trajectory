@@ -1,5 +1,12 @@
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import Landing from "./pages/Landing/Landing";
 import Login from "./pages/Login/Login";
@@ -12,10 +19,36 @@ import AddMission from "./pages/AddMission/AddMission";
 import Rewards from "./pages/Rewards/Rewards";
 import Timer from "./pages/Timer/Timer";
 import Calendar from "./pages/Calendar/Calendar";
+import Profile from "./pages/Profile/Profile";
 
-function App() {
+function TimerNavigationGuard() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const saved = (() => {
+      try {
+        return JSON.parse(localStorage.getItem("trajectoryFocusTimer") || "null");
+      } catch {
+        return null;
+      }
+    })();
+
+    const timerIsActive =
+      saved?.status === "active" && saved.endsAt > Date.now();
+
+    if (timerIsActive && location.pathname !== "/timer") {
+      navigate("/timer", { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
+  return null;
+}
+
+function AppRoutes() {
   return (
-    <BrowserRouter>
+    <>
+      <TimerNavigationGuard />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -28,7 +61,16 @@ function App() {
         <Route path="/rewards" element={<Rewards />} />
         <Route path="/timer" element={<Timer />} />
         <Route path="/calendar" element={<Calendar />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   );
 }
