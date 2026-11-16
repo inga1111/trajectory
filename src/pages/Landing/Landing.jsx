@@ -30,7 +30,7 @@ function Landing() {
               Helping neurodivergents
             </span>
             </h1>
-
+            
             <h1>
               <span className="hero-heading-rainbow">
               GET SHIT DONE.
@@ -42,7 +42,7 @@ function Landing() {
             It's a PERSONALISED
             system built for your personal needs and habits.
           </p>
-
+          <br />  
           <div className="hero-buttons">
             <Link to="/questionnaire" className="primary-button">
               Build my trajectory →

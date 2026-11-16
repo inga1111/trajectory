@@ -8,7 +8,6 @@ import {
   FiClock,
   FiPlus,
   FiTarget,
-  FiZap,
 } from "react-icons/fi";
 import "./Missions.css";
 
@@ -17,6 +16,7 @@ const PROGRESS_KEY = "trajectoryMissionProgress";
 
 function Missions() {
   const navigate = useNavigate();
+
   const [missions, setMissions] = useState([]);
   const [progressData, setProgressData] = useState({});
   const [activeFilter, setActiveFilter] = useState("All");
@@ -24,11 +24,20 @@ function Missions() {
   useEffect(() => {
     const loadData = () => {
       try {
-        const storedMissions = JSON.parse(localStorage.getItem(MISSIONS_KEY) || "[]");
-        const storedProgress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
+        const savedMissions = JSON.parse(
+          localStorage.getItem(MISSIONS_KEY) || "[]"
+        );
 
-        setMissions(Array.isArray(storedMissions) ? storedMissions : []);
-        setProgressData(storedProgress && typeof storedProgress === "object" ? storedProgress : {});
+        const savedProgress = JSON.parse(
+          localStorage.getItem(PROGRESS_KEY) || "{}"
+        );
+
+        setMissions(Array.isArray(savedMissions) ? savedMissions : []);
+        setProgressData(
+          savedProgress && typeof savedProgress === "object"
+            ? savedProgress
+            : {}
+        );
       } catch (error) {
         console.error("Could not load missions:", error);
         setMissions([]);
@@ -38,66 +47,74 @@ function Missions() {
 
     loadData();
 
-    const events = [
-      "storage",
-      "trajectoryMissionsUpdated",
-      "trajectoryProgressUpdated",
-    ];
-
-    events.forEach((event) => window.addEventListener(event, loadData));
+    window.addEventListener("storage", loadData);
+    window.addEventListener("trajectoryMissionsUpdated", loadData);
+    window.addEventListener("trajectoryProgressUpdated", loadData);
 
     return () => {
-      events.forEach((event) => window.removeEventListener(event, loadData));
+      window.removeEventListener("storage", loadData);
+      window.removeEventListener("trajectoryMissionsUpdated", loadData);
+      window.removeEventListener("trajectoryProgressUpdated", loadData);
     };
   }, []);
 
   function getProgress(mission) {
     const saved = progressData[mission.id] || {};
-    const completedSteps = saved.completedSteps || [];
-    const totalSteps = mission.steps?.length || 0;
+    const completedSteps = Array.isArray(saved.completedSteps)
+      ? saved.completedSteps
+      : [];
+
+    const totalSteps = Array.isArray(mission.steps)
+      ? mission.steps.length
+      : 0;
+
     const completedCount = completedSteps.length;
 
     const isComplete =
       saved.completed === true ||
       (totalSteps > 0 && completedCount >= totalSteps);
 
-    const percentage = totalSteps > 0
-      ? Math.round((completedCount / totalSteps) * 100)
+    const percentage = isComplete
+      ? 100
+      : totalSteps > 0
+      ? Math.min(100, Math.round((completedCount / totalSteps) * 100))
       : 0;
 
     return {
       completedCount,
       totalSteps,
-      percentage: isComplete ? 100 : percentage,
+      percentage,
       isComplete,
       hasStarted: completedCount > 0 && !isComplete,
     };
   }
 
-  const categories = [
-    "All",
-    ...new Set(missions.map((mission) => mission.category || "Other")),
-  ];
+  const categories = useMemo(() => {
+    return [
+      "All",
+      ...new Set(missions.map((mission) => mission.category || "Other")),
+    ];
+  }, [missions]);
 
-  const filteredMissions = useMemo(() => {
-    const filtered = activeFilter === "All"
-      ? missions
-      : missions.filter((mission) => (mission.category || "Other") === activeFilter);
-
-    return [...filtered].sort((a, b) => {
+  const orderedMissions = useMemo(() => {
+    return [...missions].sort((a, b) => {
       const aComplete = getProgress(a).isComplete;
       const bComplete = getProgress(b).isComplete;
 
-      if (aComplete === bComplete) {
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-      }
-
-      return aComplete ? 1 : -1;
+      return Number(aComplete) - Number(bComplete);
     });
-  }, [missions, progressData, activeFilter]);
+  }, [missions, progressData]);
 
-  const completedCount = missions.filter((mission) => getProgress(mission).isComplete).length;
-  const activeCount = missions.length - completedCount;
+  const filteredMissions =
+    activeFilter === "All"
+      ? orderedMissions
+      : orderedMissions.filter(
+          (mission) => (mission.category || "Other") === activeFilter
+        );
+
+  const completedMissions = missions.filter(
+    (mission) => getProgress(mission).isComplete
+  ).length;
 
   return (
     <main className="missions-page">
@@ -112,9 +129,13 @@ function Missions() {
           </button>
 
           <div className="missions-heading">
-            <span className="missions-eyebrow">YOUR PERSONAL MISSION BOARD</span>
+            <span className="missions-eyebrow">
+              YOUR PERSONAL MISSION BOARD
+            </span>
             <h1>Your missions</h1>
-            <p>Big things become easier when you take them one step at a time.</p>
+            <p>
+              Big things become easier when you take them one step at a time.
+            </p>
           </div>
         </header>
 
@@ -125,10 +146,13 @@ function Missions() {
             <p>
               {missions.length === 0
                 ? "Your next achievement starts with a mission."
-                : `${completedCount} completed · ${activeCount} still in progress`}
+                : `${completedMissions} of ${missions.length} missions completed`}
             </p>
           </div>
-          <span className="missions-summary-icon"><FiTarget /></span>
+
+          <span className="missions-summary-icon">
+            <FiTarget />
+          </span>
         </section>
 
         <section className="missions-list-section">
@@ -142,7 +166,8 @@ function Missions() {
               className="missions-new-button"
               onClick={() => navigate("/missions/new")}
             >
-              <FiPlus /> New mission
+              <FiPlus />
+              New Mission
             </button>
           </div>
 
@@ -151,7 +176,9 @@ function Missions() {
               {categories.map((category) => (
                 <button
                   key={category}
-                  className={`missions-filter ${activeFilter === category ? "active" : ""}`}
+                  className={`missions-filter ${
+                    activeFilter === category ? "active" : ""
+                  }`}
                   onClick={() => setActiveFilter(category)}
                   aria-pressed={activeFilter === category}
                 >
@@ -163,53 +190,100 @@ function Missions() {
 
           {missions.length === 0 ? (
             <div className="missions-empty-state">
-              <span className="missions-empty-icon"><FiTarget /></span>
+              <span className="missions-empty-icon">
+                <FiTarget />
+              </span>
+
               <h2>Your mission board is waiting.</h2>
+
               <p>
                 Add something you've been meaning to get done. We'll help you
                 break it into smaller, manageable steps.
               </p>
+
               <button
                 className="missions-new-button"
                 onClick={() => navigate("/missions/new")}
               >
-                <FiPlus /> Create your first mission
+                <FiPlus />
+                Create your first mission
               </button>
             </div>
           ) : filteredMissions.length === 0 ? (
-            <p className="missions-no-results">No missions in this category yet.</p>
+            <p className="missions-no-results">
+              No missions in this category yet.
+            </p>
           ) : (
-            <>
-              {activeCount > 0 && (
-                <div className="mission-group-heading">
-                  <span>IN PROGRESS</span>
-                  <span>{activeCount} mission{activeCount === 1 ? "" : "s"}</span>
-                </div>
-              )}
+            <div className="missions-grid">
+              {filteredMissions.map((mission) => {
+                const progress = getProgress(mission);
 
-              <div className="missions-grid">
-                {filteredMissions.filter((mission) => !getProgress(mission).isComplete).map((mission) => {
-                  const progress = getProgress(mission);
-                  const status = progress.hasStarted ? "In progress" : "Not started";
-                  const buttonLabel = progress.hasStarted ? "Continue mission" : "Start mission";
+                const status = progress.isComplete
+                  ? "Mission Complete"
+                  : progress.hasStarted
+                  ? "In progress"
+                  : "Not started";
 
-                  return (
-                    <article className={`mission-card ${progress.hasStarted ? "mission-card-started" : "mission-card-new"}`} key={mission.id}>
-                      <div className="mission-card-decoration" />
+                const buttonLabel = progress.isComplete
+                  ? "Review mission"
+                  : progress.hasStarted
+                  ? "Continue mission"
+                  : "Continue mission";
+
+                return (
+                  <article
+                    className={`mission-card ${
+                      progress.isComplete
+                        ? "mission-card-completed"
+                        : "mission-card-incomplete"
+                    }`}
+                    style={{
+                      "--mission-overlay-width": progress.isComplete
+                        ? "100%"
+                        : "40%",
+                    }}
+                    key={mission.id}
+                  >
+                    <div className="mission-card-content">
                       <div className="mission-card-top">
-                        <span className="mission-icon"><FiTarget /></span>
-                        <span className={`mission-status ${progress.hasStarted ? "status-progress" : ""}`}>
+                        <span className="mission-icon">
+                          <FiTarget />
+                        </span>
+
+                        <span
+                          className={`mission-status ${
+                            progress.isComplete
+                              ? "status-completed"
+                              : progress.hasStarted
+                              ? "status-progress"
+                              : ""
+                          }`}
+                        >
+                          {progress.isComplete && <FiCheckCircle />}
                           {status}
                         </span>
                       </div>
 
-                      <span className="mission-category">{mission.category || "Personal"}</span>
+                      <span className="mission-category">
+                        {mission.category || "Personal"}
+                      </span>
+
                       <h3>{mission.title}</h3>
-                      <p className="mission-description">{mission.description}</p>
+
+                      <p className="mission-description">
+                        {mission.description ||
+                          "A personal mission, broken into manageable steps."}
+                      </p>
 
                       <div className="mission-meta">
-                        <span><FiClock /> {progress.totalSteps} steps</span>
-                        <span>{mission.difficulty || "Your own pace"}</span>
+                        <span>
+                          <FiClock />
+                          {progress.totalSteps} steps
+                        </span>
+
+                        <span>
+                          {mission.difficulty || "Your own pace"}
+                        </span>
                       </div>
 
                       <div className="mission-progress-section">
@@ -217,97 +291,41 @@ function Missions() {
                           <span>Mission progress</span>
                           <strong>{progress.percentage}%</strong>
                         </div>
-                        <div className="mission-progress-track" role="progressbar" aria-valuenow={progress.percentage} aria-valuemin="0" aria-valuemax="100">
-                          <div className="mission-progress-fill" style={{ width: `${progress.percentage}%` }} />
+
+                        <div
+                          className="mission-progress-track"
+                          role="progressbar"
+                          aria-valuenow={progress.percentage}
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          aria-label={`${mission.title} progress`}
+                        >
+                          <div
+                            className="mission-progress-fill"
+                            style={{
+                              width: `${progress.percentage}%`,
+                            }}
+                          />
                         </div>
+
                         <span className="mission-steps-count">
-                          {progress.completedCount} of {progress.totalSteps} steps completed
+                          {progress.completedCount} of {progress.totalSteps}{" "}
+                          steps completed
                         </span>
                       </div>
 
-                      <Link to={`/missions/${mission.id}`} className="mission-open-button">
-                        {buttonLabel} <FiArrowRight />
+                      <Link
+                        to={`/missions/${mission.id}`}
+                        className="mission-open-button"
+                      >
+                        {buttonLabel}
+                        <FiArrowRight />
                       </Link>
-                    </article>
-                  );
-                })}
-              </div>
-
-              {completedCount > 0 && activeFilter === "All" && (
-                <>
-                  <div className="mission-group-heading completed-group-heading">
-                    <span>COMPLETED MISSIONS</span>
-                    <span>{completedCount} mission{completedCount === 1 ? "" : "s"}</span>
-                  </div>
-
-                  <div className="missions-grid">
-                    {filteredMissions.filter((mission) => getProgress(mission).isComplete).map((mission) => {
-                      const progress = getProgress(mission);
-
-                      return (
-                        <article className="mission-card mission-card-completed" key={mission.id}>
-                          <div className="mission-card-decoration completed-decoration" />
-                          <div className="mission-card-top">
-                            <span className="mission-icon"><FiCheckCircle /></span>
-                            <span className="mission-status status-completed"><FiCheckCircle /> Completed</span>
-                          </div>
-
-                          <span className="mission-category">{mission.category || "Personal"}</span>
-                          <h3>{mission.title}</h3>
-                          <p className="mission-description">{mission.description}</p>
-
-                          <div className="mission-meta">
-                            <span><FiCheckCircle /> {progress.totalSteps} steps completed</span>
-                            <span><FiZap /> Mission complete</span>
-                          </div>
-
-                          <div className="mission-progress-section">
-                            <div className="mission-progress-labels">
-                              <span>Mission progress</span><strong>100%</strong>
-                            </div>
-                            <div className="mission-progress-track">
-                              <div className="mission-progress-fill" style={{ width: "100%" }} />
-                            </div>
-                            <span className="mission-steps-count">You've made it through every step.</span>
-                          </div>
-
-                          <Link to={`/missions/${mission.id}`} className="mission-open-button completed-open-button">
-                            Review mission <FiArrowRight />
-                          </Link>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-
-              {activeFilter !== "All" && filteredMissions.length > 0 && (
-                <div className="missions-grid">
-                  {filteredMissions.filter((mission) => getProgress(mission).isComplete).map((mission) => {
-                    const progress = getProgress(mission);
-                    return (
-                      <article className="mission-card mission-card-completed" key={mission.id}>
-                        <div className="mission-card-decoration completed-decoration" />
-                        <div className="mission-card-top">
-                          <span className="mission-icon"><FiCheckCircle /></span>
-                          <span className="mission-status status-completed"><FiCheckCircle /> Completed</span>
-                        </div>
-                        <span className="mission-category">{mission.category || "Personal"}</span>
-                        <h3>{mission.title}</h3>
-                        <p className="mission-description">{mission.description}</p>
-                        <div className="mission-meta"><span><FiCheckCircle /> {progress.totalSteps} steps completed</span></div>
-                        <div className="mission-progress-section">
-                          <div className="mission-progress-labels"><span>Mission progress</span><strong>100%</strong></div>
-                          <div className="mission-progress-track"><div className="mission-progress-fill" style={{ width: "100%" }} /></div>
-                          <span className="mission-steps-count">You've made it through every step.</span>
-                        </div>
-                        <Link to={`/missions/${mission.id}`} className="mission-open-button completed-open-button">Review mission <FiArrowRight /></Link>
-                      </article>
-                    );
-                  })}
-                </div>
-              )}
-            </>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           )}
         </section>
       </div>
