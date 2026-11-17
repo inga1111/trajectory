@@ -8,8 +8,11 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Landing from "./pages/Landing/Landing";
-import Login from "./pages/Login/Login";
+import AuthPage from "./pages/Auth/AuthPage";
 import Questionnaire from "./pages/Questionnaire/Questionnaire";
 import Loading from "./pages/Loading/Loading";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -30,12 +33,16 @@ function TimerNavigationGuard() {
     let timer = null;
 
     try {
-      timer = JSON.parse(localStorage.getItem("trajectoryFocusTimer") || "null");
+      timer = JSON.parse(
+        localStorage.getItem("trajectoryFocusTimer") || "null"
+      );
     } catch {
       timer = null;
     }
 
-    const active = timer?.status === "active" && Number(timer.endsAt) > Date.now();
+    const active =
+      timer?.status === "active" &&
+      Number(timer.endsAt) > Date.now();
 
     if (active && location.pathname !== "/timer") {
       navigate("/timer", { replace: true });
@@ -49,20 +56,118 @@ function AppRoutes() {
   return (
     <>
       <TimerNavigationGuard />
+
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/questionnaire" element={<Questionnaire />} />
-        <Route path="/loading" element={<Loading />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/missions" element={<Missions />} />
-        <Route path="/missions/new" element={<AddMission />} />
-        <Route path="/missions/:id" element={<MissionDetail />} />
-        <Route path="/rewards" element={<Rewards />} />
-        <Route path="/timer" element={<Timer />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/assistant" element={<Assistant />} />
+
+        <Route
+          path="/login"
+          element={<AuthPage mode="login" />}
+        />
+
+        <Route
+          path="/signup"
+          element={<AuthPage mode="signup" />}
+        />
+
+        <Route
+          path="/questionnaire"
+          element={
+            <ProtectedRoute>
+              <Questionnaire />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/loading"
+          element={
+            <ProtectedRoute>
+              <Loading />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/missions"
+          element={
+            <ProtectedRoute>
+              <Missions />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/missions/new"
+          element={
+            <ProtectedRoute>
+              <AddMission />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/missions/:id"
+          element={
+            <ProtectedRoute>
+              <MissionDetail />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/rewards"
+          element={
+            <ProtectedRoute>
+              <Rewards />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/timer"
+          element={
+            <ProtectedRoute>
+              <Timer />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/calendar"
+          element={
+            <ProtectedRoute>
+              <Calendar />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/assistant"
+          element={
+            <ProtectedRoute>
+              <Assistant />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
@@ -70,9 +175,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

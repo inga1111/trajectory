@@ -3,10 +3,6 @@ import { Link } from "react-router-dom";
 import "./Landing.css";
 
 function Landing() {
-  const hasExistingTrajectory =
-    localStorage.getItem("trajectoryProfile") ||
-    localStorage.getItem("trajectoryOnboarding");
-
   return (
     <main className="landing">
       <nav className="landing-nav">
@@ -15,6 +11,7 @@ function Landing() {
         <div className="nav-links">
           <a href="#about">About</a>
           <a href="#how-it-works">How it works</a>
+
           <Link to="/login" className="login-link">
             Log in
           </Link>
@@ -23,39 +20,36 @@ function Landing() {
 
       <section className="hero">
         <div className="hero-text">
-          <p className="eyebrow">TIRED OF NOT GETTING THINGS DONE? WELL,TRAJECTORY IS...</p>
+          <p className="eyebrow">
+            TIRED OF NOT GETTING THINGS DONE? WELL, TRAJECTORY IS...
+          </p>
 
           <h1>
             <span className="hero-heading-main">
               Helping neurodivergents
             </span>
-            </h1>
-            
-            <h1>
-              <span className="hero-heading-rainbow">
+          </h1>
+
+          <h1>
+            <span className="hero-heading-rainbow">
               GET SHIT DONE.
             </span>
           </h1>
 
           <p className="hero-description">
             Trajectory isn't just another task manager or planner.
-            It's a PERSONALISED
-            system built for your personal needs and habits.
+            It's a PERSONALISED system built for your personal needs
+            and habits.
           </p>
-          <br />  
+
+          <br />
+
           <div className="hero-buttons">
-            <Link to="/questionnaire" className="primary-button">
+            <Link to="/signup" className="primary-button">
               Build my trajectory →
             </Link>
 
-            <Link
-              to={
-                hasExistingTrajectory
-                  ? "/loading"
-                  : "/questionnaire"
-              }
-              className="secondary-button"
-            >
+            <Link to="/login" className="secondary-button">
               See my trajectory
             </Link>
           </div>
