@@ -6,6 +6,7 @@ import {
   FiPlus, FiClock, FiHeart, FiZap, FiX, FiAward, FiStar,
   FiCalendar
 } from "react-icons/fi";
+import { supabase } from "../../lib/supabase";
 import "./Dashboard.css";
 
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1400, 1850, 2350, 3000];
@@ -40,9 +41,13 @@ function getLevelInfo(totalXP) {
   return {
     level: levelIndex + 1,
     nextLevelXP,
-    progress: Math.min(100, Math.max(0,
-      ((totalXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
-    )),
+    progress: Math.min(
+      100,
+      Math.max(
+        0,
+        ((totalXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
+      )
+    ),
     remainingXP: nextLevelXP - totalXP
   };
 }
@@ -50,13 +55,24 @@ function getLevelInfo(totalXP) {
 function Dashboard() {
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState(() => readStorage("trajectoryProfile", null));
-  const [missions, setMissions] = useState(() => readStorage("trajectoryMissions", []));
-  const [progress, setProgress] = useState(() => readStorage("trajectoryMissionProgress", {}));
-  const [rewards, setRewards] = useState(() => readStorage("trajectoryRewards", {
-    totalXP: 0,
-    unlockedAchievements: []
-  }));
+  const [profile, setProfile] = useState(() =>
+    readStorage("trajectoryProfile", null)
+  );
+
+  const [missions, setMissions] = useState(() =>
+    readStorage("trajectoryMissions", [])
+  );
+
+  const [progress, setProgress] = useState(() =>
+    readStorage("trajectoryMissionProgress", {})
+  );
+
+  const [rewards, setRewards] = useState(() =>
+    readStorage("trajectoryRewards", {
+      totalXP: 0,
+      unlockedAchievements: []
+    })
+  );
 
   const [firstName, setFirstName] = useState(
     () => localStorage.getItem("trajectoryName") || ""
@@ -73,15 +89,44 @@ function Dashboard() {
     );
   });
 
+  // Retrieve the authenticated user's name from Supabase.
   useEffect(() => {
+    let isMounted = true;
+
+    async function loadAccountName() {
+      if (!supabase) return;
+
+      try {
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) throw error;
+
+        if (isMounted) {
+          const fullName = data.user?.user_metadata?.full_name?.trim();
+
+          if (fullName) {
+            localStorage.setItem("trajectoryName", fullName);
+            setFirstName(fullName);
+          }
+        }
+      } catch (error) {
+        console.error("Could not load account name:", error);
+      }
+    }
+
+    loadAccountName();
+
+    // Refresh dashboard data when saved information changes.
     const refresh = () => {
       setProfile(readStorage("trajectoryProfile", null));
       setMissions(readStorage("trajectoryMissions", []));
       setProgress(readStorage("trajectoryMissionProgress", {}));
+
       setRewards(readStorage("trajectoryRewards", {
         totalXP: 0,
         unlockedAchievements: []
       }));
+
       setFirstName(localStorage.getItem("trajectoryName") || "");
     };
 
@@ -94,10 +139,16 @@ function Dashboard() {
       "storage"
     ];
 
-    events.forEach((event) => window.addEventListener(event, refresh));
+    events.forEach((event) => {
+      window.addEventListener(event, refresh);
+    });
 
     return () => {
-      events.forEach((event) => window.removeEventListener(event, refresh));
+      isMounted = false;
+
+      events.forEach((event) => {
+        window.removeEventListener(event, refresh);
+      });
     };
   }, []);
 
@@ -134,7 +185,6 @@ function Dashboard() {
     month: "long"
   });
 
-  // Use the saved signup name, with a friendly fallback.
   const displayName = firstName?.trim() || "user";
 
   const profileItems = [
@@ -482,3 +532,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
