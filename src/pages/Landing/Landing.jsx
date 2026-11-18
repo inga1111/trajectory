@@ -31,8 +31,10 @@ function Landing() {
           </h1>
 
           <h1>
-            <span className="hero-heading-rainbow">
-              GET SHIT DONE.
+            <span>
+              <span className="hero-heading-word">GET</span>{" "}
+              <span className="hero-heading-word">SHIT</span>{" "}
+              <span className="hero-heading-word">DONE.</span>
             </span>
           </h1>
 
@@ -94,7 +96,7 @@ function Landing() {
         <h2>
           You don't need more discipline.
           <br />
-          You need a system that works for you.
+          You need a system that works with you.
         </h2>
 
         <p>

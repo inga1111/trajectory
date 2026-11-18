@@ -100,12 +100,19 @@ function Dashboard() {
     () => localStorage.getItem("trajectoryName") || ""
   );
 
+  const [showProductivityHighlight, setShowProductivityHighlight] = useState(
+    () => localStorage.getItem("trajectoryProfileHighlightPending") === "true"
+  );
+
   const [showMissionPrompt, setShowMissionPrompt] = useState(() => {
     const savedProfile = getDashboardProfile();
     const savedMissions = readStorage("trajectoryMissions", []);
+    const hasPendingProfileHighlight =
+      localStorage.getItem("trajectoryProfileHighlightPending") === "true";
 
     return Boolean(
       savedProfile &&
+      !hasPendingProfileHighlight &&
       savedMissions.length === 0 &&
       localStorage.getItem("trajectoryMissionPromptDismissed") !== "true"
     );
@@ -173,6 +180,21 @@ function Dashboard() {
       });
     };
   }, []);
+
+  useEffect(() => {
+    if (!showProductivityHighlight) return undefined;
+
+    function handleHighlightKeyDown(event) {
+      if (event.key === "Escape") {
+        localStorage.removeItem("trajectoryProfileHighlightPending");
+        setShowProductivityHighlight(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleHighlightKeyDown);
+    return () =>
+      window.removeEventListener("keydown", handleHighlightKeyDown);
+  }, [showProductivityHighlight]);
 
   const totalMissions = missions.length;
 
@@ -243,8 +265,131 @@ function Dashboard() {
     setShowMissionPrompt(false);
   }
 
+  function dismissProductivityHighlight() {
+    localStorage.removeItem("trajectoryProfileHighlightPending");
+    setShowProductivityHighlight(false);
+  }
+
+  function getRoutineExplanation() {
+    const challengeAdvice = {
+      "I don't know where to start":
+        "We'll help make the first step clear and small.",
+      "I get distracted easily":
+        "A short, focused timer can give one task a clear boundary.",
+      "Everything feels overwhelming":
+        "We'll break your mission into manageable steps instead of asking you to do it all at once.",
+      "I struggle to stay motivated":
+        "Visible progress and gentle encouragement can help you keep momentum.",
+    };
+
+    const approachAdvice = {
+      "Breaking it into tiny steps":
+        "Your missions are organised into smaller actions.",
+      "Having a clear deadline":
+        "A focus session gives one part of your task a defined time window.",
+      "Someone keeping me accountable":
+        "Checking off each step helps make your progress visible.",
+      "Getting started before I overthink it":
+        "You can focus on the next action rather than planning the whole mission.",
+    };
+
+    const workStyle = profile?.workStyle || "";
+    const sessionAdvice = workStyle.includes("Short bursts")
+      ? "Your short-burst preference informed the 15-minute starting session."
+      : workStyle.includes("Long focused")
+        ? "Your preference for longer focus informed the 40-minute starting session."
+        : "We suggest a 25-minute starting session; you can adjust it to fit the day.";
+
+    return [
+      challengeAdvice[profile?.mainChallenge] ||
+        "Your answers help keep your plan focused on a manageable next action.",
+      approachAdvice[profile?.preferredApproach] || "",
+      sessionAdvice,
+    ].filter(Boolean).join(" ");
+  }
+
   return (
     <main className="dashboard-page">
+
+      {showProductivityHighlight && profile && (
+        <div className="profile-highlight-backdrop">
+          <section
+            className="profile-highlight"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profile-highlight-title"
+            aria-describedby="profile-highlight-description"
+          >
+            <button
+              className="profile-highlight-close"
+              onClick={dismissProductivityHighlight}
+              aria-label="Close productivity profile highlight"
+            >
+              <FiX />
+            </button>
+
+            <div className="profile-highlight-icon"><FiZap /></div>
+            <span className="card-label">YOUR PROFILE HIGHLIGHT</span>
+            <h2 id="profile-highlight-title">A routine shaped around you.</h2>
+            <p id="profile-highlight-description" className="profile-highlight-intro">
+              Your onboarding answers help Trajectory suggest a starting point.
+              It’s a flexible guide, not a rulebook.
+            </p>
+
+            <div className="profile-highlight-facts">
+              <div>
+                <span>Your main challenge</span>
+                <strong>{profile.mainChallenge || "Finding a comfortable starting point"}</strong>
+              </div>
+              <div>
+                <span>What helps you most</span>
+                <strong>{profile.preferredApproach || "A flexible approach"}</strong>
+              </div>
+              <div>
+                <span>Your working style</span>
+                <strong>{profile.workStyle || "Whatever feels right that day"}</strong>
+              </div>
+              <div>
+                <span>Motivation that fits you</span>
+                <strong>{profile.motivationStyle || "Gentle encouragement"}</strong>
+              </div>
+            </div>
+
+            <div className="profile-highlight-routine">
+              <span className="card-label">YOUR RECOMMENDED ROUTINE</span>
+              <strong>{profile.recommendedSessionLength || "25 minutes"} to focus</strong>
+              <span className="profile-highlight-planning">
+                Planning approach:{" "}
+                <b>
+                  {profile.planningStyle?.replaceAll("-", " ") || "balanced"}
+                </b>
+              </span>
+              <p>{getRoutineExplanation()}</p>
+            </div>
+
+            <div className="profile-highlight-actions">
+              <button
+                className="profile-highlight-done"
+                onClick={dismissProductivityHighlight}
+              >
+                Got it
+              </button>
+              <button
+                className="profile-highlight-timer"
+                onClick={() => {
+                  dismissProductivityHighlight();
+                  navigate(missions.length === 0 ? "/missions/new" : "/timer");
+                }}
+              >
+                {missions.length === 0
+                  ? "Create your first mission"
+                  : "Try a focus session"}{" "}
+                <FiArrowRight />
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {showMissionPrompt && (
         <div className="mission-prompt-backdrop">
@@ -386,9 +531,19 @@ function Dashboard() {
                 <h2>How you work best.</h2>
               </div>
 
-              <Link to="/profile" className="profile-edit-link">
-                Edit profile <FiArrowRight />
-              </Link>
+              <div className="profile-header-actions">
+                {profile && (
+                  <button
+                    className="profile-insight-link"
+                    onClick={() => setShowProductivityHighlight(true)}
+                  >
+                    <FiZap /> Your profile insight
+                  </button>
+                )}
+                <Link to="/profile" className="profile-edit-link">
+                  Edit profile <FiArrowRight />
+                </Link>
+              </div>
             </div>
 
             {profile ? (
@@ -437,6 +592,15 @@ function Dashboard() {
               <Link to="/timer" className="text-link">
                 <FiClock /> Start a focus session <FiArrowRight />
               </Link>
+
+              {profile && (
+                <button
+                  className="routine-insight-link"
+                  onClick={() => setShowProductivityHighlight(true)}
+                >
+                  <FiZap /> Why this routine?
+                </button>
+              )}
 
               <div className="routine-divider" />
 

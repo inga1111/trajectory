@@ -96,6 +96,7 @@ function Questionnaire() {
         "trajectoryOnboarding",
         JSON.stringify(onboardingData)
       );
+      localStorage.setItem("trajectoryProfileHighlightPending", "true");
 
       try {
         if (supabase) {
