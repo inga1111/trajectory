@@ -7,6 +7,7 @@ import {
   FiCalendar
 } from "react-icons/fi";
 import { supabase } from "../../lib/supabase";
+import trajectoryMascot from "../../assets/trajectory-mascot.png";
 import "./Dashboard.css";
 
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1400, 1850, 2350, 3000];
@@ -17,6 +18,29 @@ function readStorage(key, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function getDashboardProfile() {
+  const savedProfile = readStorage("trajectoryProfile", null);
+  if (savedProfile) return savedProfile;
+
+  const onboarding = readStorage("trajectoryOnboarding", null);
+  if (!onboarding?.completed || !Array.isArray(onboarding.answers)) return null;
+
+  const answers = onboarding.answers;
+  const workStyle = answers[2]?.answer || "";
+  const preferredApproach = answers[1]?.answer || "";
+
+  return {
+    mainChallenge: answers[0]?.answer || "Not yet identified",
+    preferredApproach: preferredApproach || "Not yet identified",
+    workStyle: workStyle || "Not yet identified",
+    motivationStyle: answers[3]?.answer || "Not yet identified",
+    recommendedSessionLength: workStyle === "Short bursts with breaks"
+      ? "15 minutes"
+      : "25 minutes",
+    planningStyle: preferredApproach || "Balanced",
+  };
 }
 
 function getLevelInfo(totalXP) {
@@ -55,9 +79,7 @@ function getLevelInfo(totalXP) {
 function Dashboard() {
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState(() =>
-    readStorage("trajectoryProfile", null)
-  );
+  const [profile, setProfile] = useState(() => getDashboardProfile());
 
   const [missions, setMissions] = useState(() =>
     readStorage("trajectoryMissions", [])
@@ -79,7 +101,7 @@ function Dashboard() {
   );
 
   const [showMissionPrompt, setShowMissionPrompt] = useState(() => {
-    const savedProfile = readStorage("trajectoryProfile", null);
+    const savedProfile = getDashboardProfile();
     const savedMissions = readStorage("trajectoryMissions", []);
 
     return Boolean(
@@ -118,7 +140,7 @@ function Dashboard() {
 
     // Refresh dashboard data when saved information changes.
     const refresh = () => {
-      setProfile(readStorage("trajectoryProfile", null));
+      setProfile(getDashboardProfile());
       setMissions(readStorage("trajectoryMissions", []));
       setProgress(readStorage("trajectoryMissionProgress", {}));
 
@@ -291,13 +313,17 @@ function Dashboard() {
           <a href="#progress" className="nav-item">
             <FiBarChart2 /><span>Progress</span>
           </a>
-        </nav>
 
-        <div className="sidebar-bottom">
+          <Link to="/assistant" className="nav-item">
+            <FiZap /><span>AI companion</span>
+          </Link>
+
           <Link to="/profile" className="nav-item">
             <FiSettings /><span>My profile</span>
           </Link>
+        </nav>
 
+        <div className="sidebar-bottom">
           <Link to="/profile" className="profile-mini">
             <div className="profile-avatar">
               {displayName.charAt(0).toUpperCase()}
@@ -309,10 +335,6 @@ function Dashboard() {
             </div>
           </Link>
 
-          <Link to="/assistant" className="nav-item">
-            <FiZap />
-            <span>AI companion</span>
-          </Link>
         </div>
       </aside>
 
@@ -518,7 +540,7 @@ function Dashboard() {
         </section>
 
         <section className="star-companion" aria-label="Trajectory star companion">
-          <div className="companion-star">★</div>
+          <img className="companion-mascot" src={trajectoryMascot} alt="Trajectory mascot" />
 
           <div>
             <span className="card-label">A LITTLE REMINDER</span>
