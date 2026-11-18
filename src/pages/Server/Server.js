@@ -142,7 +142,7 @@ const server = http.createServer(async (request, response) => {
     return;
   }
 
-  if (request.method !== "POST" || request.url !== "/api/assistant") {
+  if (request.method !== "POST" || request.url !== "/api/chat") {
     sendJSON(response, 404, { error: "Endpoint not found." }, allowedOrigin);
     return;
   }

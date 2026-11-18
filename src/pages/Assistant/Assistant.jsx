@@ -100,7 +100,22 @@ function Assistant() {
         }),
       });
 
-      const data = await response.json();
+      const responseBody = await response.text();
+      let data;
+
+      try {
+        data = responseBody ? JSON.parse(responseBody) : null;
+      } catch {
+        throw new Error(
+          `The assistant service returned an invalid response (HTTP ${response.status}).`
+        );
+      }
+
+      if (!data || typeof data !== "object") {
+        throw new Error(
+          `The assistant service returned an empty response (HTTP ${response.status}).`
+        );
+      }
 
       if (!response.ok) {
         throw new Error(
@@ -108,11 +123,16 @@ function Assistant() {
         );
       }
 
+      const assistantMessage = data.message || data.reply;
+      if (typeof assistantMessage !== "string") {
+        throw new Error("The assistant returned a response without a message.");
+      }
+
       setMessages((current) => [
         ...current,
         {
           role: "assistant",
-          content: data.message || "Let's take this one step at a time.",
+          content: assistantMessage,
         },
       ]);
 
