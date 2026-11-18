@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,7 +8,6 @@ import {
   FiGift,
   FiTarget,
   FiZap,
-  FiAward,
 } from "react-icons/fi";
 import "./MissionDetail.css";
 
@@ -136,6 +134,18 @@ function MissionDetail() {
 
       const progress = savedProgress[selectedMission.id] || {};
 
+      // Opening a mission moves it into the "In progress" group.
+      if (!progress.completed && !progress.started) {
+        savedProgress[selectedMission.id] = {
+          ...progress,
+          started: true,
+          startedAt: new Date().toISOString(),
+        };
+
+        localStorage.setItem(PROGRESS_KEY, JSON.stringify(savedProgress));
+        window.dispatchEvent(new Event("trajectoryProgressUpdated"));
+      }
+
       setMission(selectedMission);
       setCompletedSteps(progress.completedSteps || []);
       setIsComplete(progress.completed === true);
@@ -173,14 +183,9 @@ function MissionDetail() {
         completedAt: completed ? new Date().toISOString() : null,
       };
 
-      localStorage.setItem(
-        PROGRESS_KEY,
-        JSON.stringify(allProgress)
-      );
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(allProgress));
 
-      window.dispatchEvent(
-        new Event("trajectoryProgressUpdated")
-      );
+      window.dispatchEvent(new Event("trajectoryProgressUpdated"));
     } catch (error) {
       console.error("Could not save mission progress:", error);
     }
@@ -193,8 +198,7 @@ function MissionDetail() {
 
     const previousProgress = allProgress[mission.id] || {};
 
-    const awardedStepIndices =
-      previousProgress.awardedStepIndices || [];
+    const awardedStepIndices = previousProgress.awardedStepIndices || [];
 
     const newlyAwardedSteps = nextCompletedSteps.filter(
       (stepIndex) => !awardedStepIndices.includes(stepIndex)
@@ -210,9 +214,7 @@ function MissionDetail() {
       nextCompletedSteps.length === steps.length;
 
     const missionBonus =
-      isNowComplete && !missionBonusAlreadyAwarded
-        ? MISSION_XP
-        : 0;
+      isNowComplete && !missionBonusAlreadyAwarded ? MISSION_XP : 0;
 
     const totalEarned = completedStepXP + missionBonus;
 
@@ -224,28 +226,21 @@ function MissionDetail() {
       ],
       missionBonusAwarded:
         missionBonusAlreadyAwarded || missionBonus > 0,
-      xpAwarded:
-        (previousProgress.xpAwarded || 0) + missionBonus,
+      xpAwarded: (previousProgress.xpAwarded || 0) + missionBonus,
     };
 
     allProgress[mission.id] = updatedProgress;
 
-    localStorage.setItem(
-      PROGRESS_KEY,
-      JSON.stringify(allProgress)
-    );
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(allProgress));
 
     const previousRewards = readRewards();
 
-    const completedMissionCount = Object.values(
-      allProgress
-    ).filter((item) => item.completed === true).length;
+    const completedMissionCount = Object.values(allProgress).filter(
+      (item) => item.completed === true
+    ).length;
 
-    const completedStepCount = Object.values(
-      allProgress
-    ).reduce(
-      (total, item) =>
-        total + (item.completedSteps?.length || 0),
+    const completedStepCount = Object.values(allProgress).reduce(
+      (total, item) => total + (item.completedSteps?.length || 0),
       0
     );
 
@@ -277,10 +272,7 @@ function MissionDetail() {
       unlockedAchievements: [...unlocked],
     };
 
-    localStorage.setItem(
-      REWARDS_KEY,
-      JSON.stringify(updatedRewards)
-    );
+    localStorage.setItem(REWARDS_KEY, JSON.stringify(updatedRewards));
 
     setRewards(updatedRewards);
     setEarnedXP(totalEarned);
@@ -303,15 +295,11 @@ function MissionDetail() {
     setCompletedSteps(nextCompletedSteps);
     setIsComplete(nextIsComplete);
 
-    // Save mission state before calculating its rewards.
     saveProgress(nextCompletedSteps, nextIsComplete);
 
-    // Only newly completed steps and the first mission completion earn XP.
     if (!completedSteps.includes(index)) {
       awardRewards(nextCompletedSteps);
 
-      // Earlier steps get a mini celebration.
-      // The final step gets the full mission-completion celebration.
       if (!nextIsComplete) {
         const celebrationId = `${index}-${Date.now()}`;
 
@@ -534,8 +522,8 @@ function MissionDetail() {
                     {earnedXP > MISSION_XP
                       ? `${STEP_XP} XP per step + ${MISSION_XP} mission bonus`
                       : earnedXP === MISSION_XP
-                      ? "Mission completion bonus"
-                      : "Step completion reward"}
+                        ? "Mission completion bonus"
+                        : "Step completion reward"}
                   </small>
                 </div>
               </div>
@@ -724,9 +712,7 @@ function MissionDetail() {
                       <span>STEP {index + 1}</span>
                       <h3>{step.title}</h3>
 
-                      {step.description && (
-                        <p>{step.description}</p>
-                      )}
+                      {step.description && <p>{step.description}</p>}
 
                       {step.duration && (
                         <small>

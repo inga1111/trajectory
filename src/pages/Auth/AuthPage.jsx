@@ -16,7 +16,7 @@ function AuthPage({ mode = "login" }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(() =>
     searchParams.get("confirmed") === "1"
-      ? "Your email has been confirmed! Welcome to Trajectory. You can now sign in and get started."
+      ? "Your email has been confirmed! You can now sign in and get started."
       : ""
   );
   const [submitting, setSubmitting] = useState(false);
@@ -55,6 +55,7 @@ function AuthPage({ mode = "login" }) {
             options: {
               data: {
                 full_name: name.trim(),
+                trajectory_onboarding_completed: false,
               },
               emailRedirectTo: `${window.location.origin}/login?confirmed=1`,
             },
@@ -62,7 +63,7 @@ function AuthPage({ mode = "login" }) {
 
         if (signupError) throw signupError;
 
-        if (data.session) {
+        if (data.session && data.user) {
           saveUserName(data.user);
           setShowOnboardingWelcome(true);
         } else {
@@ -79,13 +80,13 @@ function AuthPage({ mode = "login" }) {
 
         if (loginError) throw loginError;
 
-        saveUserName(data.user);
+        const user = data.user;
+        saveUserName(user);
 
-        const hasExistingTrajectory =
-          localStorage.getItem("trajectoryProfile") ||
-          localStorage.getItem("trajectoryOnboarding");
+        const onboardingCompleted =
+          user?.user_metadata?.trajectory_onboarding_completed === true;
 
-        if (hasExistingTrajectory) {
+        if (onboardingCompleted) {
           navigate("/dashboard", { replace: true });
         } else {
           setShowOnboardingWelcome(true);
@@ -98,6 +99,11 @@ function AuthPage({ mode = "login" }) {
     }
   }
 
+  function startOnboarding() {
+    setShowOnboardingWelcome(false);
+    navigate("/questionnaire", { replace: true });
+  }
+
   return (
     <main className="auth-page">
       <nav className="auth-nav">
@@ -106,12 +112,12 @@ function AuthPage({ mode = "login" }) {
         </Link>
 
         <Link to="/" className="auth-back">
-          Back to home
+          ← Back home
         </Link>
       </nav>
 
-      <section className="auth-card">
-        <div className="auth-heading">
+      <div className="auth-main">
+        <section className="auth-heading">
           <p className="auth-eyebrow">
             {isSignup ? "YOUR JOURNEY STARTS HERE" : "WELCOME BACK"}
           </p>
@@ -124,91 +130,99 @@ function AuthPage({ mode = "login" }) {
               </>
             ) : (
               <>
-                Good to have
-                <span> you back.</span>
+                Ready to get
+                <span> moving?</span>
               </>
             )}
           </h1>
 
-          <p>
+          <p className="auth-description">
             {isSignup
               ? "Create your account and let's find a system that works for your brain."
-              : "Sign in to pick up where you left off."}
+              : "Pick up where you left off and keep your trajectory going."}
           </p>
-        </div>
+        </section>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {isSignup && (
+        <section className="auth-card">
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {isSignup && (
+              <label>
+                Your name
+                <input
+                  type="text"
+                  placeholder="What should we call you?"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  autoComplete="name"
+                  required
+                />
+              </label>
+            )}
+
             <label>
-              Your name
+              Email
               <input
-                type="text"
-                placeholder="What should we call you?"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                autoComplete="name"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
                 required
               />
             </label>
-          )}
 
-          <label>
-            Email address
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              required
-            />
-          </label>
+            <label>
+              Password
+              <input
+                type="password"
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete={isSignup ? "new-password" : "current-password"}
+                minLength={8}
+                required
+              />
+            </label>
 
-          <label>
-            Password
-            <input
-              type="password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete={isSignup ? "new-password" : "current-password"}
-              minLength={8}
-              required
-            />
-          </label>
+            {error && (
+              <p className="auth-message auth-error" role="alert">
+                {error}
+              </p>
+            )}
 
-          {error && (
-            <p className="auth-message auth-error" role="alert">
-              {error}
-            </p>
-          )}
+            {notice && (
+              <p className="auth-message auth-success" role="status">
+                {notice}
+              </p>
+            )}
 
-          {notice && (
-            <p className="auth-message auth-success" role="status">
-              {notice}
-            </p>
-          )}
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={submitting}
+            >
+              {submitting
+                ? "Please wait..."
+                : isSignup
+                  ? "Create my trajectory"
+                  : "Log in →"}
+            </button>
+          </form>
 
-          <button
-            type="submit"
-            className="auth-submit"
-            disabled={submitting}
-          >
-            {submitting
-              ? "Please wait..."
-              : isSignup
-                ? "Create my account"
-                : "Sign in"}
-          </button>
-        </form>
+          <div className="auth-divider">
+            <span />
+            <span>or</span>
+            <span />
+          </div>
 
-        <p className="auth-switch">
-          {isSignup ? "Already have an account?" : "New to Trajectory?"}{" "}
-          <Link to={isSignup ? "/login" : "/signup"}>
-            {isSignup ? "Sign in" : "Create an account"}
-          </Link>
-        </p>
-      </section>
+          <p className="auth-switch">
+            {isSignup ? "Already have an account?" : "New to Trajectory?"}{" "}
+            <Link to={isSignup ? "/login" : "/signup"}>
+              {isSignup ? "Log in" : "Create my trajectory"}
+            </Link>
+          </p>
+        </section>
+      </div>
 
       <p className="auth-footer">
         A little progress is still progress.
@@ -225,7 +239,7 @@ function AuthPage({ mode = "login" }) {
             <div className="onboarding-welcome-decoration">✦</div>
 
             <span className="auth-eyebrow">
-              YOUR JOURNEY STARTS HERE
+              A LITTLE INTRODUCTION
             </span>
 
             <h2 id="onboarding-welcome-title">
@@ -233,13 +247,13 @@ function AuthPage({ mode = "login" }) {
             </h2>
 
             <p>
-              We'll take you through a few quick questions about your
-              productivity style, habits and preferences.
+              Before we get started, we'll ask you a few quick questions
+              about your productivity style, habits and preferences.
             </p>
 
             <p>
-              Your answers will help us personalise Trajectory and build
-              a system that works with your brain, not against it.
+              Your answers will help us shape Trajectory around the way
+              you work best.
             </p>
 
             <div className="onboarding-welcome-note">
@@ -247,10 +261,11 @@ function AuthPage({ mode = "login" }) {
             </div>
 
             <button
+              type="button"
               className="auth-submit"
-              onClick={() => navigate("/questionnaire", { replace: true })}
+              onClick={startOnboarding}
             >
-              Let's get started
+              Let's get started →
             </button>
           </section>
         </div>

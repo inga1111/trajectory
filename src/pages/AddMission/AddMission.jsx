@@ -75,7 +75,6 @@ function AddMission() {
       return;
     }
 
-    // Ignore empty step rows, but keep every step with a title.
     const validSteps = steps
       .filter((step) => step.title.trim().length > 0)
       .map((step) => ({
@@ -120,12 +119,10 @@ function AddMission() {
         JSON.stringify(updatedMissions)
       );
 
-      // Tell the dashboard and missions page to refresh.
       window.dispatchEvent(
         new Event("trajectoryMissionsUpdated")
       );
 
-      // The first mission has now been created.
       localStorage.removeItem("trajectoryMissionPromptDismissed");
 
       navigate("/missions");

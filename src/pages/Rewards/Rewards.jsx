@@ -98,6 +98,7 @@ function readRewards() {
 
 function Rewards() {
   const [rewards, setRewards] = useState(readRewards);
+  const [activeFilter, setActiveFilter] = useState("All");
 
   useEffect(() => {
     const updateRewards = () => {
@@ -120,6 +121,13 @@ function Rewards() {
   const earnedCount = ACHIEVEMENTS.filter((achievement) =>
     unlockedAchievements.includes(achievement.id)
   ).length;
+
+  const filteredAchievements = ACHIEVEMENTS.filter((achievement) => {
+    const matchesCategory =
+      activeFilter === "All" || achievement.category === activeFilter;
+
+    return matchesCategory;
+  });
 
   return (
     <main className="rewards-page">
@@ -156,7 +164,7 @@ function Rewards() {
 
           <div className="rewards-xp-total">
             <strong>{totalXP.toLocaleString()}</strong>
-            <span> TOTAL XP</span>
+            <span>TOTAL XP</span>
           </div>
 
           <div className="rewards-progress-track">
@@ -207,8 +215,24 @@ function Rewards() {
             </span>
           </div>
 
+          <div className="rewards-filters" aria-label="Filter achievements">
+            {["All", "Missions", "Progress"].map((filter) => (
+              <button
+                type="button"
+                key={filter}
+                className={`rewards-filter ${
+                  activeFilter === filter ? "active" : ""
+                }`}
+                onClick={() => setActiveFilter(filter)}
+                aria-pressed={activeFilter === filter}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
           <div className="rewards-grid">
-            {ACHIEVEMENTS.map((achievement) => {
+            {filteredAchievements.map((achievement) => {
               const unlocked = unlockedAchievements.includes(
                 achievement.id
               );
@@ -222,11 +246,7 @@ function Rewards() {
                 >
                   <div className="rewards-achievement-top">
                     <div className="rewards-achievement-icon">
-                      {unlocked ? (
-                        achievement.icon
-                      ) : (
-                        <FiLock />
-                      )}
+                      {unlocked ? achievement.icon : <FiLock />}
                     </div>
 
                     {unlocked ? (
@@ -248,7 +268,6 @@ function Rewards() {
                     </span>
 
                     <h3>{achievement.title}</h3>
-
                     <p>{achievement.description}</p>
                   </div>
 
@@ -263,7 +282,7 @@ function Rewards() {
         </section>
 
         <section className="rewards-encouragement">
-          <span>💜</span>
+          <span>🤍</span>
           <div>
             <h3>Progress isn't always linear.</h3>
             <p>

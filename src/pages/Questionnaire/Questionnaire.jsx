@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "../../lib/supabase";
 import "./Questionnaire.css";
 
 const questions = [
@@ -65,6 +66,7 @@ function Questionnaire() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
+  const [saving, setSaving] = useState(false);
 
   const question = questions[currentQuestion];
   const selectedAnswer = answers[currentQuestion];
@@ -75,10 +77,12 @@ function Questionnaire() {
     setAnswers(updatedAnswers);
   }
 
-  function handleNext() {
-    if (!selectedAnswer) return;
+  async function handleNext() {
+    if (!selectedAnswer || saving) return;
 
     if (currentQuestion === questions.length - 1) {
+      setSaving(true);
+
       const onboardingData = {
         answers: questions.map((item, index) => ({
           question: item.question,
@@ -92,6 +96,35 @@ function Questionnaire() {
         "trajectoryOnboarding",
         JSON.stringify(onboardingData)
       );
+
+      try {
+        if (supabase) {
+          const { data } = await supabase.auth.getUser();
+          const userId = data?.user?.id;
+
+          if (userId) {
+            localStorage.setItem(
+              `trajectoryOnboardingCompleted:${userId}`,
+              "true"
+            );
+
+            const { error } = await supabase.auth.updateUser({
+              data: {
+                trajectory_onboarding_completed: true,
+              },
+            });
+
+            if (error) {
+              console.error(
+                "Could not sync onboarding completion:",
+                error.message
+              );
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Onboarding completion could not be synced:", error);
+      }
 
       navigate("/loading");
       return;
@@ -109,8 +142,7 @@ function Questionnaire() {
     setCurrentQuestion((previous) => previous - 1);
   }
 
-  const progress =
-    ((currentQuestion + 1) / questions.length) * 100;
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
     <main className="questionnaire-page">
@@ -119,12 +151,19 @@ function Questionnaire() {
           trajectory.
         </Link>
 
-        <span>
-          {currentQuestion + 1} / {questions.length}
+        <span className="questionnaire-counter">
+          {currentQuestion + 1} <span>/</span> {questions.length}
         </span>
       </nav>
 
-      <div className="progress-track">
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuenow={currentQuestion + 1}
+        aria-valuemin={1}
+        aria-valuemax={questions.length}
+        aria-label="Questionnaire progress"
+      >
         <div
           className="progress-bar"
           style={{ width: `${progress}%` }}
@@ -132,8 +171,17 @@ function Questionnaire() {
       </div>
 
       <section className="questionnaire-content">
+        <div className="questionnaire-intro">
+          <span className="questionnaire-kicker">
+            LET'S MAKE THIS YOURS
+          </span>
+          <p>
+            A little about you, so we can make Trajectory work with you.
+          </p>
+        </div>
+
         <div className="question-number">
-          0{currentQuestion + 1}
+          QUESTION 0{currentQuestion + 1}
         </div>
 
         <h1>{question.question}</h1>
@@ -151,14 +199,17 @@ function Questionnaire() {
                 selectedAnswer === option ? "selected" : ""
               }`}
               onClick={() => handleAnswer(option)}
+              aria-pressed={selectedAnswer === option}
             >
               <span className="answer-number">
                 {String.fromCharCode(65 + index)}
               </span>
 
-              <span>{option}</span>
+              <span className="answer-text">{option}</span>
 
-              <span className="answer-arrow">→</span>
+              <span className="answer-arrow">
+                {selectedAnswer === option ? "✓" : "→"}
+              </span>
             </button>
           ))}
         </div>
@@ -168,6 +219,7 @@ function Questionnaire() {
             type="button"
             className="back-button"
             onClick={handleBack}
+            disabled={saving}
           >
             ← Back
           </button>
@@ -178,13 +230,19 @@ function Questionnaire() {
               selectedAnswer ? "active" : ""
             }`}
             onClick={handleNext}
-            disabled={!selectedAnswer}
+            disabled={!selectedAnswer || saving}
           >
-            {currentQuestion === questions.length - 1
-              ? "Build my trajectory"
-              : "Continue →"}
+            {saving
+              ? "Saving..."
+              : currentQuestion === questions.length - 1
+                ? "Build my trajectory →"
+                : "Continue →"}
           </button>
         </div>
+
+        <p className="questionnaire-reassurance">
+          Take your time. You can always grow and adjust your system later.
+        </p>
       </section>
     </main>
   );

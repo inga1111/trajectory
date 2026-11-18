@@ -34,6 +34,11 @@ function Assistant() {
     []
   );
 
+  const progress = useMemo(
+    () => readJSON("trajectoryMissionProgress", {}),
+    []
+  );
+
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -88,7 +93,9 @@ function Assistant() {
           missions: missions.slice(-15).map((mission) => ({
             title: mission.title,
             category: mission.category,
-            completedSteps: mission.steps?.length || 0,
+            completedSteps:
+              progress[mission.id]?.completedSteps?.length || 0,
+            totalSteps: mission.steps?.length || 0,
           })),
         }),
       });
