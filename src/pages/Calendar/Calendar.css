@@ -3,6 +3,18 @@
   min-height: 100vh;
   background: #fff8ef;
   color: #293337;
+  animation: calendar-page-enter 600ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes calendar-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .calendar-header {
@@ -49,6 +61,7 @@
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 32px;
+  animation: calendar-item-enter 480ms 80ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .calendar-eyebrow {
@@ -137,6 +150,38 @@
   border: 1px solid #eee6dc;
   border-radius: 22px;
   background: #fffdfa;
+  animation: calendar-item-enter 520ms 140ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.calendar-agenda {
+  animation-delay: 220ms;
+}
+
+.calendar-day {
+  animation: calendar-day-enter 420ms cubic-bezier(.22, 1, .36, 1) both;
+  animation-delay: calc(var(--calendar-day-index, 0) * 12ms + 180ms);
+}
+
+@keyframes calendar-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes calendar-day-enter {
+  from {
+    opacity: 0;
+    transform: scale(.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .calendar-month-heading {
@@ -395,5 +440,14 @@
 
   .calendar-day {
     border-radius: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-page *,
+  .calendar-page *::before,
+  .calendar-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

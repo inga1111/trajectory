@@ -140,6 +140,9 @@ function Missions() {
   }, [missions, progressData]);
 
   const totalCompleted = groups.completed.length;
+  const completionPercentage = missions.length
+    ? Math.round((totalCompleted / missions.length) * 100)
+    : 0;
 
   const visibleGroups =
     activeFilter === "all"
@@ -204,11 +207,6 @@ function Missions() {
             ? "mission-card-completed"
             : "mission-card-incomplete"
         }`}
-        style={{
-          "--mission-overlay-width": progress.isComplete
-            ? "100%"
-            : "40%",
-        }}
         key={mission.id}
       >
         <div className="mission-card-content">
@@ -317,10 +315,17 @@ function Missions() {
               one step at a time.
             </p>
           </div>
+          <button
+            className="missions-new-button"
+            onClick={() => navigate("/missions/new")}
+          >
+            <FiPlus />
+            New mission
+          </button>
         </header>
 
         <section className="missions-summary">
-          <div>
+          <div className="missions-summary-copy">
             <span className="missions-summary-label">
               YOUR PROGRESS
             </span>
@@ -332,11 +337,33 @@ function Missions() {
                 ? "Your next achievement starts with a mission."
                 : `${totalCompleted} of ${missions.length} missions completed`}
             </p>
+
+            <div
+              className="missions-summary-track"
+              role="progressbar"
+              aria-valuenow={completionPercentage}
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-label="Missions completed"
+            >
+              <span style={{ width: `${completionPercentage}%` }} />
+            </div>
           </div>
 
-          <span className="missions-summary-icon">
-            <FiTarget />
-          </span>
+          <div className="missions-summary-stats">
+            <div>
+              <strong>{missions.length}</strong>
+              <span>Total missions</span>
+            </div>
+            <div>
+              <strong>{groups["in-progress"].length}</strong>
+              <span>In progress</span>
+            </div>
+            <div>
+              <strong>{totalCompleted}</strong>
+              <span>Completed</span>
+            </div>
+          </div>
         </section>
 
         <section className="missions-list-section">
@@ -345,14 +372,6 @@ function Missions() {
               <h2>Your mission list</h2>
               <p>Choose what you want to focus on.</p>
             </div>
-
-            <button
-              className="missions-new-button"
-              onClick={() => navigate("/missions/new")}
-            >
-              <FiPlus />
-              New Mission
-            </button>
           </div>
 
           {missions.length > 0 && (
@@ -414,33 +433,38 @@ function Missions() {
             </div>
           ) : (
             <div className="missions-groups">
-              {visibleGroups.map((group) => (
-                <section
-                  className="mission-status-group"
-                  key={group.id}
-                >
-                  <div className="mission-status-heading">
-                    <div>
-                      <h3>{group.title}</h3>
-                      <p>{group.subtitle}</p>
+              {visibleGroups
+                .filter(
+                  (group) =>
+                    group.items.length > 0 || activeFilter !== "all"
+                )
+                .map((group) => (
+                  <section
+                    className="mission-status-group"
+                    key={group.id}
+                  >
+                    <div className="mission-status-heading">
+                      <div>
+                        <h3>{group.title}</h3>
+                        <p>{group.subtitle}</p>
+                      </div>
+
+                      <span>{group.items.length}</span>
                     </div>
 
-                    <span>{group.items.length}</span>
-                  </div>
-
-                  {group.items.length > 0 ? (
-                    <div className="missions-grid">
-                      {group.items.map(renderMission)}
-                    </div>
-                  ) : (
-                    <p className="missions-no-results">
-                      {activeFilter === "all"
-                        ? "Nothing here just yet."
-                        : "No missions in this section yet."}
-                    </p>
-                  )}
-                </section>
-              ))}
+                    {group.items.length > 0 ? (
+                      <div className="missions-grid">
+                        {group.items.map(renderMission)}
+                      </div>
+                    ) : (
+                      <p className="missions-no-results">
+                        {activeFilter === "all"
+                          ? "Nothing here just yet."
+                          : "No missions in this section yet."}
+                      </p>
+                    )}
+                  </section>
+                ))}
             </div>
           )}
         </section>

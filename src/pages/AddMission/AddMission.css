@@ -2,7 +2,10 @@
 .add-mission-page {
   min-height: 100vh;
   padding: 48px 24px 80px;
-  background: #faf9fc;
+  background:
+    radial-gradient(ellipse at 92% 8%, rgba(216, 236, 239, 0.48), transparent 34%),
+    #fff8ef;
+  animation: add-mission-page-enter 600ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .add-mission-container {
@@ -17,19 +20,26 @@
   gap: 9px;
   border: none;
   background: transparent;
-  color: #625b70;
+  color: #718083;
   font-size: 14px;
   cursor: pointer;
   margin-bottom: 38px;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.add-mission-back:hover {
+  color: #628c89;
+  transform: translateX(-2px);
 }
 
 .add-mission-heading {
   margin-bottom: 36px;
+  animation: add-mission-content-enter 600ms 80ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .add-mission-eyebrow {
   display: block;
-  color: #8975c9;
+  color: #8caaa7;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -44,7 +54,7 @@
 }
 
 .add-mission-heading h1 {
-  color: #292333;
+  color: #617c7c;
   font-size: clamp(30px, 5vw, 44px);
   margin: 0 0 12px;
 }
@@ -63,9 +73,10 @@
   width: 65px;
   height: 65px;
   border-radius: 20px;
-  background: #eee9fb;
-  color: #8975c9;
+  background: linear-gradient(135deg, #e2f3ef, #eaf4f7 65%, #f2eafa);
+  color: #6d9692;
   font-size: 27px;
+  box-shadow: 0 7px 20px rgba(132, 174, 171, 0.13);
 }
 
 .add-mission-form {
@@ -75,11 +86,20 @@
 }
 
 .add-mission-section {
-  background: #fff;
-  border: 1px solid #eeeaf3;
-  border-radius: 18px;
+  background: rgba(255, 253, 250, 0.94);
+  border: 1px solid rgba(172, 211, 204, 0.55);
+  border-radius: 22px;
   padding: 28px;
-  box-shadow: 0 8px 30px rgba(44, 32, 66, 0.035);
+  box-shadow: 0 9px 28px rgba(132, 174, 171, 0.1), 0 2px 8px rgba(180, 158, 194, 0.06);
+  animation: add-mission-content-enter 600ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.add-mission-section:nth-child(1) {
+  animation-delay: 160ms;
+}
+
+.add-mission-section:nth-child(2) {
+  animation-delay: 240ms;
 }
 
 .add-mission-section-heading {
@@ -97,20 +117,20 @@
   height: 34px;
   flex-shrink: 0;
   border-radius: 10px;
-  background: #eee9fb;
-  color: #806bc1;
+  background: #e2f3ef;
+  color: #628c89;
   font-size: 12px;
   font-weight: 700;
 }
 
 .add-mission-section-heading h2 {
-  color: #302a3a;
+  color: #526b6d;
   font-size: 19px;
   margin: 2px 0 6px;
 }
 
 .add-mission-section-heading p {
-  color: #898392;
+  color: #818d8e;
   font-size: 13px;
   line-height: 1.5;
   margin: 0;
@@ -118,7 +138,7 @@
 
 .add-mission-section label {
   display: block;
-  color: #514a5c;
+  color: #697572;
   font-size: 13px;
   font-weight: 600;
   margin: 18px 0 8px;
@@ -131,21 +151,21 @@
   width: 100%;
   box-sizing: border-box;
   padding: 13px 14px;
-  border: 1px solid #e8e4ed;
+  border: 1px solid #e8e1d8;
   border-radius: 10px;
   background: #fff;
-  color: #302a3a;
+  color: #293337;
   font: inherit;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .add-mission-section input:focus,
 .add-mission-section textarea:focus,
 .add-mission-section select:focus {
-  border-color: #9b87d7;
-  box-shadow: 0 0 0 3px rgba(139, 120, 214, 0.12);
+  border-color: #9bcac5;
+  box-shadow: 0 0 0 3px rgba(135, 192, 181, 0.16);
 }
 
 .add-mission-section textarea {
@@ -164,9 +184,22 @@
   align-items: flex-start;
   gap: 13px;
   padding: 17px;
-  border: 1px solid #eeeaf3;
+  border: 1px solid #e7ece8;
   border-radius: 13px;
-  background: #fdfcff;
+  background: #fbfdfb;
+  animation: add-mission-content-enter 480ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.add-mission-step:nth-child(1) {
+  animation-delay: 300ms;
+}
+
+.add-mission-step:nth-child(2) {
+  animation-delay: 360ms;
+}
+
+.add-mission-step:nth-child(3) {
+  animation-delay: 420ms;
 }
 
 .add-mission-step-number {
@@ -177,8 +210,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #eee9fb;
-  color: #806bc1;
+  background: #e2f3ef;
+  color: #628c89;
   font-size: 11px;
   font-weight: 700;
   margin-top: 25px;
@@ -211,11 +244,13 @@
   background: #f7f3f8;
   color: #9b829d;
   cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
 .add-mission-remove-step:hover {
   background: #fbeeee;
   color: #c45e70;
+  transform: translateY(-1px);
 }
 
 .add-mission-add-step {
@@ -224,13 +259,19 @@
   gap: 8px;
   margin-top: 18px;
   padding: 11px 15px;
-  border: 1px dashed #b9a9df;
+  border: 1px dashed #a9d9d2;
   border-radius: 10px;
-  background: #faf8ff;
-  color: #806bc1;
+  background: #f4faf7;
+  color: #628c89;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.add-mission-add-step:hover {
+  background: #eaf5f1;
+  transform: translateY(-1px);
 }
 
 .add-mission-error {
@@ -239,6 +280,7 @@
   background: #fff0f0;
   color: #b64d5b;
   font-size: 13px;
+  animation: add-mission-content-enter 240ms ease both;
 }
 
 .add-mission-actions {
@@ -259,28 +301,60 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .add-mission-cancel {
-  border: 1px solid #e6e1ec;
+  border: 1px solid #e5e3dd;
   background: #fff;
-  color: #655e70;
+  color: #687879;
+}
+
+.add-mission-cancel:hover {
+  background: #f4f8f5;
 }
 
 .add-mission-submit {
-  border: none;
-  background: #8873ca;
-  color: #fff;
-  transition: background 0.2s, transform 0.2s;
+  border: 1px solid #a9d9d2;
+  background: linear-gradient(135deg, #bce8e1, #d4eee6);
+  color: #527a77;
+  box-shadow: 0 5px 16px rgba(135, 192, 181, 0.16);
 }
 
 .add-mission-submit:hover {
-  background: #7560b7;
   transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(135, 192, 181, 0.24);
 }
 
 .add-mission-submit-icon {
   transform: rotate(180deg);
+}
+
+.add-mission-page button:focus-visible {
+  outline: 3px solid #a9d9d2;
+  outline-offset: 3px;
+}
+
+@keyframes add-mission-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes add-mission-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 600px) {
@@ -316,5 +390,14 @@
   .add-mission-cancel,
   .add-mission-submit {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-mission-page *,
+  .add-mission-page *::before,
+  .add-mission-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }
